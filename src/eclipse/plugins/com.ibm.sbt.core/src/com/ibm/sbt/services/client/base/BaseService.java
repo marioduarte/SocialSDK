@@ -181,7 +181,7 @@ public abstract class BaseService {
 	/*
 	 * This method makes a network call and returns a Collection of Entities
 	 */
-	protected EntityList<? extends BaseEntity> getEntities(String url, Map<String, String> parameters, IFeedHandler feedHandler) throws ClientServicesException, IOException {
+	protected EntityList<? extends BaseEntity> getEntities(String url, Map<String, String> parameters, IFeedHandler feedHandler) throws ClientServicesException {
 		Response dataHolder = retrieveData(url, parameters);
 		return feedHandler.createEntityList(dataHolder);
 	}
@@ -321,7 +321,7 @@ public abstract class BaseService {
 	 * @throws ClientServicesException
 	 * @throws IOException 
 	 */
-	public Response retrieveData(String url, Map<String, String> parameters) throws ClientServicesException, IOException {
+	public Response retrieveData(String url, Map<String, String> parameters) throws ClientServicesException {
 		return retrieveData(url, parameters, null);
 	}
 
@@ -336,8 +336,8 @@ public abstract class BaseService {
 	 * @throws ClientServicesException
 	 * @throws IOException
 	 */
-	public Response retrieveData(String url, Map<String, String> parameters, Map<String, String> headers, String nameParameterId)
-	            throws ClientServicesException, IOException {
+	public Response retrieveData(String url, Map<String, String> parameters, Map<String, String> headers, String nameParameterId) throws ClientServicesException
+	             {
 	        Object data = null;
 	        Response dataHolder = null;
 	        String uniqueId = "";
@@ -368,7 +368,7 @@ public abstract class BaseService {
 	 * @throws IOException 
 	 */
 	//TODO Fix cache with DataHolder object
-	public Response retrieveData(String url, Map<String, String> parameters, String nameParameterId) throws ClientServicesException, IOException {
+	public Response retrieveData(String url, Map<String, String> parameters, String nameParameterId) throws ClientServicesException {
 			return retrieveData(url, parameters, new HashMap<String, String>(), nameParameterId);
 	}
 	

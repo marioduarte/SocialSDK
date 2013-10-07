@@ -41,7 +41,7 @@ import com.ibm.sbt.services.client.connections.activity.TextField;
  */
 
 public class ActivityTransformer extends AbstractBaseTransformer {
-
+	
 	private String	SOURCEPATH = "/com/ibm/sbt/services/client/connections/activity/templates/";
 	private ActivityService service;
 	/*

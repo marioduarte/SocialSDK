@@ -24,9 +24,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.ibm.commons.util.StringUtil;
+import com.ibm.commons.util.io.json.JsonJavaObject;
+import com.ibm.sbt.services.client.ClientService;
 import com.ibm.sbt.services.client.ClientServicesException;
 import com.ibm.sbt.services.client.Response;
 import com.ibm.sbt.services.client.base.BaseService;
+import com.ibm.sbt.services.client.base.datahandlers.JsonDataHandler;
 import com.ibm.sbt.services.client.base.transformers.TransformerException;
 import com.ibm.sbt.services.client.connections.profiles.feedhandler.ColleagueConnectionFeedHandler;
 import com.ibm.sbt.services.client.connections.profiles.feedhandler.ProfileFeedHandler;
@@ -35,9 +38,6 @@ import com.ibm.sbt.services.client.connections.profiles.transformers.ColleagueCo
 import com.ibm.sbt.services.client.connections.profiles.transformers.ProfileTransformer;
 import com.ibm.sbt.services.client.connections.profiles.utils.Messages;
 import com.ibm.sbt.services.client.connections.profiles.utils.ProfilesConstants;
-import com.ibm.sbt.services.client.base.datahandlers.JsonDataHandler;
-import com.ibm.commons.util.io.json.JsonJavaObject;
-import com.ibm.sbt.services.client.ClientService;
 import com.ibm.sbt.services.endpoints.Endpoint;
 import com.ibm.sbt.services.util.AuthUtil;
 /**
@@ -180,8 +180,6 @@ public class ProfileService extends BaseService {
 			profiles = (ProfileList) getEntities(url, parameters, new ProfileFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new ProfileServiceException(e, Messages.SearchException);
-		} catch (IOException e) {
-			throw new ProfileServiceException(e, Messages.SearchException);
 		}
 
 		return profiles;
@@ -226,8 +224,6 @@ public class ProfileService extends BaseService {
 	    try {
 	      tags = (TagList) getEntities(url, parameters, new TagFeedHandler(this));
 	    } catch (ClientServicesException e) {
-	      throw new ProfileServiceException(e, Messages.TagsException, id);
-	    } catch (IOException e) {
 	      throw new ProfileServiceException(e, Messages.TagsException, id);
 	    }
 	
@@ -276,8 +272,6 @@ public class ProfileService extends BaseService {
 			profiles = (ProfileList) getEntities(url, parameters, new ProfileFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new ProfileServiceException(e, Messages.ColleaguesException, id);
-		} catch (IOException e) {
-			throw new ProfileServiceException(e, Messages.ColleaguesException, id);
 		}
 
 		return profiles;
@@ -323,8 +317,6 @@ public class ProfileService extends BaseService {
 		try {
 			colleagueConnections = (ColleagueConnectionList) getEntities(url, parameters, new ColleagueConnectionFeedHandler(this));
 		} catch (ClientServicesException e) {
-			throw new ProfileServiceException(e, Messages.ColleaguesException, id);
-		} catch (IOException e) {
 			throw new ProfileServiceException(e, Messages.ColleaguesException, id);
 		}
 
@@ -449,8 +441,6 @@ public class ProfileService extends BaseService {
 			profiles = (ProfileList) getEntities(url, parameters, new ProfileFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new ProfileServiceException(e, Messages.CommonColleaguesException, sourceId, targetId );
-		} catch (IOException e) {
-			throw new ProfileServiceException(e, Messages.CommonColleaguesException, sourceId, targetId);
 		}
 
 		return profiles;
@@ -510,8 +500,6 @@ public class ProfileService extends BaseService {
 			colleagueConnections = (ColleagueConnectionList) getEntities(url, parameters, new ColleagueConnectionFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new ProfileServiceException(e, Messages.CommonColleaguesException, sourceId, targetId);
-		} catch (IOException e) {
-			throw new ProfileServiceException(e, Messages.CommonColleaguesException, sourceId, targetId);
 		}
 
 		return colleagueConnections;
@@ -553,8 +541,6 @@ public class ProfileService extends BaseService {
 		try {
 			profiles = (ProfileList) getEntities(url, parameters, new ProfileFeedHandler(this));
 		} catch (ClientServicesException e) {
-			throw new ProfileServiceException(e, Messages.ReportingChainException, id);
-		} catch (IOException e) {
 			throw new ProfileServiceException(e, Messages.ReportingChainException, id);
 		}
 
@@ -599,8 +585,6 @@ public class ProfileService extends BaseService {
 		try {
 			profiles = (ProfileList) getEntities(url, parameters, new ProfileFeedHandler(this));
 		} catch (ClientServicesException e) {
-			throw new ProfileServiceException(e, Messages.DirectReportsException, id);
-		} catch (IOException e) {
 			throw new ProfileServiceException(e, Messages.DirectReportsException, id);
 		}
 		return profiles;

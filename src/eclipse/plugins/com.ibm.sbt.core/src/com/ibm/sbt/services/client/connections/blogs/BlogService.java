@@ -16,7 +16,6 @@
 
 package com.ibm.sbt.services.client.connections.blogs;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +31,7 @@ import com.ibm.sbt.services.client.connections.blogs.feedhandler.CommentsFeedHan
 import com.ibm.sbt.services.client.connections.blogs.feedhandler.PostsFeedHandler;
 import com.ibm.sbt.services.client.connections.blogs.feedhandler.TagFeedHandler;
 import com.ibm.sbt.services.client.connections.blogs.transformers.BaseBlogTransformer;
+import com.ibm.sbt.services.client.connections.forums.ForumServiceException;
 import com.ibm.sbt.services.endpoints.Endpoint;
 import com.ibm.sbt.services.util.AuthUtil;
 
@@ -109,8 +109,6 @@ public class BlogService extends BaseService {
 			blogs = (BlogList)getEntities(blogsUrl, parameters, new BlogsFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new BlogServiceException(e);
-		} catch (IOException e) {
-			throw new BlogServiceException(e);
 		}
 		return blogs;
 	}
@@ -145,8 +143,6 @@ public class BlogService extends BaseService {
 			blogs = (BlogList)getEntities(myBlogsUrl, parameters, new BlogsFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new BlogServiceException(e);
-		} catch (IOException e) {
-			throw new BlogServiceException(e);
 		}
 		return blogs;
 	}
@@ -180,8 +176,6 @@ public class BlogService extends BaseService {
 			blogs = (BlogList)getEntities(featuredBlogsUrl, parameters, new BlogsFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new BlogServiceException(e);
-		} catch (IOException e) {
-			throw new BlogServiceException(e);
 		}
 		return blogs;
 	}
@@ -213,8 +207,6 @@ public class BlogService extends BaseService {
 			String latestPostsUrl = resolveUrl(BLOG_HANDLE, FilterType.BLOGS_POSTS, null);
 			posts = (PostList)getEntities(latestPostsUrl, parameters, new PostsFeedHandler(this));
 		} catch (ClientServicesException e) {
-			throw new BlogServiceException(e);
-		} catch (IOException e) {
 			throw new BlogServiceException(e);
 		}
 		return posts;
@@ -249,8 +241,6 @@ public class BlogService extends BaseService {
 			posts = (PostList)getEntities(featuredPostsUrl, parameters, new PostsFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new BlogServiceException(e);
-		} catch (IOException e) {
-			throw new BlogServiceException(e);
 		}
 		return posts;
 	}
@@ -283,8 +273,6 @@ public class BlogService extends BaseService {
 			String recommendedPostsUrl = resolveUrl(BLOG_HANDLE, FilterType.RECOMMENDED_BLOGS_POSTS, null);
 			posts = (PostList)getEntities(recommendedPostsUrl, parameters, new PostsFeedHandler(this));
 		} catch (ClientServicesException e) {
-			throw new BlogServiceException(e);
-		} catch (IOException e) {
 			throw new BlogServiceException(e);
 		}
 		return posts;
@@ -319,8 +307,6 @@ public class BlogService extends BaseService {
 			comments = (CommentList)getEntities(commentsUrl, parameters, new CommentsFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new BlogServiceException(e);
-		} catch (IOException e) {
-			throw new BlogServiceException(e);
 		}
 		return comments;
 	}
@@ -337,8 +323,6 @@ public class BlogService extends BaseService {
 			String allTagsUrl = resolveUrl(BLOG_HANDLE, FilterType.BLOGS_TAGS, null);
 			tags = (TagList)getEntities(allTagsUrl, null, new TagFeedHandler(this));
 		} catch (ClientServicesException e) {
-			throw new BlogServiceException(e);
-		} catch (IOException e) {
 			throw new BlogServiceException(e);
 		}
 		return tags;
@@ -373,8 +357,6 @@ public class BlogService extends BaseService {
 			posts = (PostList)getEntities(latestPostsUrl, parameters, new PostsFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new BlogServiceException(e);
-		} catch (IOException e) {
-			throw new BlogServiceException(e);
 		}
 		return posts;
 	}
@@ -408,8 +390,6 @@ public class BlogService extends BaseService {
 			comments = (CommentList)getEntities(latestCommentsUrl, parameters, new CommentsFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new BlogServiceException(e);
-		} catch (IOException e) {
-			throw new BlogServiceException(e);
 		}
 		return comments;
 	}
@@ -426,8 +406,6 @@ public class BlogService extends BaseService {
 			String allTagsUrl = resolveUrl(blogHandle, FilterType.BLOG_TAGS, null);
 			tags = (TagList)getEntities(allTagsUrl, null, new TagFeedHandler(this));
 		} catch (ClientServicesException e) {
-			throw new BlogServiceException(e);
-		} catch (IOException e) {
 			throw new BlogServiceException(e);
 		}
 		return tags;

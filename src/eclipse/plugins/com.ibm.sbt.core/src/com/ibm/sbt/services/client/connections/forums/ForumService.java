@@ -112,8 +112,6 @@ public class ForumService extends BaseService {
 			forums = (ForumList)getEntities(allForumsUrl, parameters, new ForumsFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new ForumServiceException(e);
-		} catch (IOException e) {
-			throw new ForumServiceException(e);
 		}
 		return forums;
 	}
@@ -147,8 +145,6 @@ public class ForumService extends BaseService {
 			forums = (ForumList)getEntities(publicForumsUrl, parameters, new ForumsFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new ForumServiceException(e);
-		} catch (IOException e) {
-			throw new ForumServiceException(e);
 		}
 		return forums;
 	}
@@ -181,8 +177,6 @@ public class ForumService extends BaseService {
 			forums = (ForumList) getEntities(myForumsUrl, parameters, new ForumsFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new ForumServiceException(e);
-		} catch (IOException e) {
-			throw new ForumServiceException(e);
 		}
 
 		return forums;
@@ -200,8 +194,6 @@ public class ForumService extends BaseService {
 		try {
 			tags = (TagList) getEntities(tagsUrl, null, new TagFeedHandler(this));
 		} catch (ClientServicesException e) {
-			throw new ForumServiceException(e);
-		} catch (IOException e) {
 			throw new ForumServiceException(e);
 		}
 
@@ -240,8 +232,6 @@ public class ForumService extends BaseService {
 		try {
 			tags = (TagList) getEntities(tagsUrl, parameters, new TagFeedHandler(this));
 		} catch (ClientServicesException e) {
-			throw new ForumServiceException(e);
-		} catch (IOException e) {
 			throw new ForumServiceException(e);
 		}
 
@@ -410,8 +400,6 @@ public class ForumService extends BaseService {
 			topics = (TopicList) getEntities(myTopicsUrl, parameters, new TopicsFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new ForumServiceException(e);
-		} catch (IOException e) {
-			throw new ForumServiceException(e);
 		}
 
 		return topics;
@@ -446,8 +434,6 @@ public class ForumService extends BaseService {
 		try {
 			topics = (TopicList) getEntities(myTopicsUrl, parameters, new TopicsFeedHandler(this));
 		} catch (ClientServicesException e) {
-			throw new ForumServiceException(e);
-		} catch (IOException e) {
 			throw new ForumServiceException(e);
 		}
 
@@ -487,8 +473,6 @@ public class ForumService extends BaseService {
 		try {
 			topics = (TopicList) getEntities(myTopicsUrl, parameters, new TopicsFeedHandler(this));
 		} catch (ClientServicesException e) {
-			throw new ForumServiceException(e);
-		} catch (IOException e) {
 			throw new ForumServiceException(e);
 		}
 

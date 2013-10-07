@@ -36,7 +36,6 @@
 
 package com.ibm.sbt.services.client.connections.search;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -44,9 +43,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.ibm.commons.util.StringUtil;
-import com.ibm.commons.util.io.json.JsonException;
-import com.ibm.commons.util.io.json.JsonJavaFactory;
-import com.ibm.commons.util.io.json.JsonObject;
 import com.ibm.sbt.services.client.ClientServicesException;
 import com.ibm.sbt.services.client.base.BaseService;
 import com.ibm.sbt.services.client.base.ConnectionsConstants;
@@ -130,8 +126,6 @@ public class SearchService extends BaseService {
 			String searchQry = resolveUrl(SearchType.PUBLIC);
 			searchResults = (ResultList) getEntities(searchQry, parameters, new SearchFeedHandler(this));
 		} catch (ClientServicesException e) {
-			throw new SearchServiceException(e);
-		} catch (IOException e) {
 			throw new SearchServiceException(e);
 		}
 		return searchResults;
@@ -263,8 +257,6 @@ public class SearchService extends BaseService {
 			searchResults = (ResultList) getEntities(searchQry, parameters, new SearchFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new SearchServiceException(e);
-		} catch (IOException e) {
-			throw new SearchServiceException(e);
 		}
 		return searchResults;
 		
@@ -309,8 +301,6 @@ public class SearchService extends BaseService {
 			String searchQry = resolveUrl(SearchType.PUBLIC);
 			searchResults = (FacetValueList) getEntities(searchQry, parameters, new FacetsHandler(this, "Person"));
 		} catch (ClientServicesException e) {
-			throw new SearchServiceException(e);
-		} catch (IOException e) {
 			throw new SearchServiceException(e);
 		}
 		return searchResults;
@@ -358,8 +348,6 @@ public class SearchService extends BaseService {
 			String searchQry = resolveUrl(SearchType.MY);
 			searchResults = (ResultList) getEntities(searchQry, parameters, new FacetsHandler(this, "Person"));
 		} catch (ClientServicesException e) {
-			throw new SearchServiceException(e);
-		} catch (IOException e) {
 			throw new SearchServiceException(e);
 		}
 		return searchResults;
@@ -438,8 +426,6 @@ public class SearchService extends BaseService {
 			String searchQry = resolveUrl(SearchType.SCOPE);
 			scopes = (ScopeList) getEntities(searchQry, params, new ScopeFeedHandler(this));
 		} catch (ClientServicesException e) {
-			throw new SearchServiceException(e);
-		} catch (IOException e) {
 			throw new SearchServiceException(e);
 		}
 		return scopes;

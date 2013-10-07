@@ -16,9 +16,7 @@
 
 package com.ibm.sbt.services.client.connections.activitystreams;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -973,8 +971,6 @@ public class ActivityStreamService extends BaseService {
 		try {
 			activityStreams = (ActivityStreamEntityList) getEntities(url, params, activityStreamFeedHandler);
 		} catch (ClientServicesException e) {
-			throw new ActivityStreamServiceException(e, "Problem occurred while creating list of activity streams");
-		} catch (IOException e) {
 			throw new ActivityStreamServiceException(e, "Problem occurred while creating list of activity streams");
 		}
 		return activityStreams;

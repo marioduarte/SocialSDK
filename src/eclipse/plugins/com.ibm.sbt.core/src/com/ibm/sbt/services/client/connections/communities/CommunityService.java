@@ -24,25 +24,23 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.Header;
 
 import com.ibm.commons.util.StringUtil;
+import com.ibm.sbt.services.client.ClientService;
 import com.ibm.sbt.services.client.ClientServicesException;
+import com.ibm.sbt.services.client.Response;
 import com.ibm.sbt.services.client.base.BaseService;
 import com.ibm.sbt.services.client.base.ConnectionsConstants;
 import com.ibm.sbt.services.client.base.transformers.TransformerException;
 import com.ibm.sbt.services.client.base.util.EntityUtil;
 import com.ibm.sbt.services.client.connections.communities.feedhandler.BookmarkFeedHandler;
 import com.ibm.sbt.services.client.connections.communities.feedhandler.CommunityFeedHandler;
-import com.ibm.sbt.services.client.connections.forums.feedhandler.ForumsFeedHandler;
-import com.ibm.sbt.services.client.connections.forums.feedhandler.TopicsFeedHandler;
 import com.ibm.sbt.services.client.connections.communities.feedhandler.InviteFeedHandler;
 import com.ibm.sbt.services.client.connections.communities.feedhandler.MemberFeedHandler;
 import com.ibm.sbt.services.client.connections.communities.transformers.CommunityMemberTransformer;
 import com.ibm.sbt.services.client.connections.communities.transformers.InviteTransformer;
 import com.ibm.sbt.services.client.connections.communities.util.Messages;
-import com.ibm.sbt.services.client.connections.forums.Forum;
 import com.ibm.sbt.services.client.connections.forums.ForumService;
 import com.ibm.sbt.services.client.connections.forums.TopicList;
-import com.ibm.sbt.services.client.Response;
-import com.ibm.sbt.services.client.ClientService;
+import com.ibm.sbt.services.client.connections.forums.feedhandler.TopicsFeedHandler;
 import com.ibm.sbt.services.endpoints.Endpoint;
 import com.ibm.sbt.services.util.AuthUtil;
 
@@ -146,8 +144,6 @@ public class CommunityService extends BaseService {
 			communities = (CommunityList) getEntities(requestUrl, parameters, new CommunityFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new CommunityServiceException(e, Messages.PublicCommunitiesException);
-		} catch (IOException e) {
-			throw new CommunityServiceException(e, Messages.PublicCommunitiesException);
 		}
 		
 		return communities;
@@ -215,8 +211,6 @@ public class CommunityService extends BaseService {
 			members = (MemberList) getEntities(requestUrl, parameters, new MemberFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new CommunityServiceException(e, Messages.CommunityMembersException, communityUuid);
-		} catch (IOException e) {
-			throw new CommunityServiceException(e, Messages.CommunityMembersException, communityUuid);
 		}
 		
 		return members;
@@ -247,8 +241,6 @@ public class CommunityService extends BaseService {
 		try {
 			communities = (CommunityList) getEntities(requestUrl, parameters, new CommunityFeedHandler(this));
 		} catch (ClientServicesException e) {
-			throw new CommunityServiceException(e, Messages.MyCommunitiesException);
-		} catch (IOException e) {
 			throw new CommunityServiceException(e, Messages.MyCommunitiesException);
 		}
 		
@@ -284,8 +276,6 @@ public class CommunityService extends BaseService {
 			communities = (CommunityList) getEntities(requestUrl, parameters, new CommunityFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new CommunityServiceException(e, Messages.SubCommunitiesException, communityUuid);
-		} catch (IOException e) {
-			throw new CommunityServiceException(e, Messages.SubCommunitiesException, communityUuid);
 		}
 		
 		return communities;
@@ -320,8 +310,6 @@ public class CommunityService extends BaseService {
 			bookmarks = (BookmarkList) getEntities(requestUrl, parameters, new BookmarkFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new CommunityServiceException(e, Messages.CommunityBookmarksException, communityUuid);
-		} catch (IOException e) {
-			throw new CommunityServiceException(e, Messages.CommunityBookmarksException, communityUuid);
 		}
 		
 		return bookmarks;
@@ -355,8 +343,6 @@ public class CommunityService extends BaseService {
 			forumTopics = (TopicList) getEntities(requestUrl, parameters, new TopicsFeedHandler(new ForumService()));
 		}catch (ClientServicesException e) {
 			throw new CommunityServiceException(e, Messages.CommunityForumTopicsException, communityUuid);
-		} catch (IOException e) {
-			throw new CommunityServiceException(e, Messages.CommunityForumTopicsException, communityUuid);
 		}
 		
 		return forumTopics;
@@ -386,8 +372,6 @@ public class CommunityService extends BaseService {
 			invites = (InviteList) getEntities(requestUrl, parameters, new InviteFeedHandler(this));
 			
 		}catch (ClientServicesException e) {
-			throw new CommunityServiceException(e, Messages.CommunityInvitationsException);
-		} catch (IOException e) {
 			throw new CommunityServiceException(e, Messages.CommunityInvitationsException);
 		}
 		

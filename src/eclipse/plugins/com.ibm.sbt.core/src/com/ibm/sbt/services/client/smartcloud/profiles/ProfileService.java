@@ -191,8 +191,6 @@ public class ProfileService extends BaseService {
 			return (ProfileList) getEntities(serviceUrl, null, profileFeedHandler);
 		} catch (ClientServicesException e) {
 			throw new ProfileServiceException(e, Messages.ProfileError_2);
-		} catch (IOException e) {
-			throw new ProfileServiceException(e, Messages.ProfileError_2);
 		}
 	}
 
@@ -218,8 +216,6 @@ public class ProfileService extends BaseService {
 			return (ProfileList) getEntities(serviceUrl, null, profileFeedHandler);
 		} catch (ClientServicesException e) {
 			throw new ProfileServiceException(e, Messages.ProfileError_2);
-		} catch (IOException e) {
-			throw new ProfileServiceException(e, Messages.ProfileError_2);
 		}
 	}
 
@@ -234,8 +230,6 @@ public class ProfileService extends BaseService {
 		try {
 			return (ProfileList) getEntities(serviceUrl, null, profileFeedHandler);
 		} catch (ClientServicesException e) {
-			throw new ProfileServiceException(e, Messages.ProfileError_3);
-		} catch (IOException e) {
 			throw new ProfileServiceException(e, Messages.ProfileError_3);
 		}
 	}
