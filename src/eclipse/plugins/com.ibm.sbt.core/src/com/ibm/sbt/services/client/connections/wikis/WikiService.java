@@ -19,8 +19,9 @@ package com.ibm.sbt.services.client.connections.wikis;
 import java.util.Map;
 
 import com.ibm.sbt.services.client.ClientServicesException;
+import com.ibm.sbt.services.client.base.IFeedHandler;
+import com.ibm.sbt.services.client.base.datahandlers.EntityList;
 import com.ibm.sbt.services.client.connections.wikis.base.BaseService;
-import com.ibm.sbt.services.client.connections.wikis.base.EntityList;
 import com.ibm.sbt.services.endpoints.Endpoint;
 
 /**
@@ -108,7 +109,7 @@ public class WikiService extends BaseService<Wiki> {
 	}
 
 	@Override
-	protected WikiFeedHandler getFeedHandler() {
+	protected IFeedHandler getFeedHandler() {
 		return new WikiFeedHandler(this);
 	}
 }

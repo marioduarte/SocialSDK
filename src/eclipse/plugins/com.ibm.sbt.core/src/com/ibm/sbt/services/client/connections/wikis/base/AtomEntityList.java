@@ -23,7 +23,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import com.ibm.sbt.services.client.Response;
-import com.ibm.sbt.services.client.base.BaseEntity;
+import com.ibm.sbt.services.client.base.AtomEntity;
 import com.ibm.sbt.services.client.base.ConnectionsConstants;
 import com.ibm.sbt.services.client.base.ConnectionsFeedXpath;
 import com.ibm.sbt.services.client.base.IFeedHandler;
@@ -33,9 +33,9 @@ import com.ibm.sbt.services.client.base.datahandlers.XmlDataHandler;
  * @author Mario Duarte
  *
  */
-public class EntityList<T extends BaseEntity> extends com.ibm.sbt.services.client.base.datahandlers.EntityList<T> {
+public class AtomEntityList<T extends AtomEntity> extends com.ibm.sbt.services.client.base.datahandlers.EntityList<T> {
 
-	public EntityList(Response requestData, IFeedHandler feedHandler) {
+	public AtomEntityList(Response requestData, IFeedHandler feedHandler) {
 		super(requestData, feedHandler);
 	}
 	

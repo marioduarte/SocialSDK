@@ -20,13 +20,13 @@ import org.w3c.dom.Node;
 
 import com.ibm.sbt.services.client.base.BaseService;
 import com.ibm.sbt.services.client.base.ConnectionsConstants;
-import com.ibm.sbt.services.client.connections.wikis.base.FeedHandler;
+import com.ibm.sbt.services.client.connections.wikis.base.AtomFeedHandler;
 
 /**
  * @author Mario Duarte
  *
  */
-public class WikiFeedHandler extends FeedHandler<Wiki> {
+public class WikiFeedHandler extends AtomFeedHandler<Wiki> {
 
 	public WikiFeedHandler(BaseService service) {
 		super(service);

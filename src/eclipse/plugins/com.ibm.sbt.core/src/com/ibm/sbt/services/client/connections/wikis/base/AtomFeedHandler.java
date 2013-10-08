@@ -19,7 +19,7 @@ package com.ibm.sbt.services.client.connections.wikis.base;
 import org.w3c.dom.Node;
 
 import com.ibm.sbt.services.client.Response;
-import com.ibm.sbt.services.client.base.BaseEntity;
+import com.ibm.sbt.services.client.base.AtomEntity;
 import com.ibm.sbt.services.client.base.BaseService;
 import com.ibm.sbt.services.client.base.IFeedHandler;
 
@@ -27,11 +27,11 @@ import com.ibm.sbt.services.client.base.IFeedHandler;
  * @author Mario Duarte
  *
  */
-public abstract class FeedHandler<T extends BaseEntity> implements IFeedHandler{
+public abstract class AtomFeedHandler<T extends AtomEntity> implements IFeedHandler {
 
 	private BaseService service;
 	
-	public FeedHandler(BaseService service) {
+	public AtomFeedHandler(BaseService service) {
 		this.service = service;
 	}
 	
@@ -47,8 +47,8 @@ public abstract class FeedHandler<T extends BaseEntity> implements IFeedHandler{
 	}
 
 	@Override
-	public EntityList<T> createEntityList(Response dataHolder) {
-		return new EntityList<T>(dataHolder, this);
+	public AtomEntityList<T> createEntityList(Response dataHolder) {
+		return new AtomEntityList<T>(dataHolder, this);
 	}
 
 	@Override
