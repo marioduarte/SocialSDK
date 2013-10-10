@@ -108,8 +108,13 @@ public class WikiService extends BaseService<Wiki> {
 		return getEntityList(requestUrl, parameters);
 	}
 
-	@Override
-	protected IFeedHandler getFeedHandler() {
-		return new WikiFeedHandler(this);
+	
+	@SuppressWarnings("unchecked")
+	protected EntityList<Wiki> getEntityList(String requestUrl, Map<String, String> parameters) throws ClientServicesException {
+		return (EntityList<Wiki>)getEntities(requestUrl, getParameters(parameters), getWikiFeedHandler());
+	}
+	
+	protected IFeedHandler getWikiFeedHandler() {
+		return  new WikiFeedHandler(this);
 	}
 }
