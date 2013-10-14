@@ -11,10 +11,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.StringWriter;
+import java.util.HashSet;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.conn.EofSensorInputStream;
+import org.junit.Test;
 
 import com.ibm.commons.util.io.base64.Base64InputStream;
 import com.ibm.commons.util.io.base64.Base64OutputStream;
@@ -29,6 +30,9 @@ public class MockService extends ClientService {
 	//private MockMode mode = MockMode.PASSTHRU;
 	private MockMode mode = MockMode.RECORD;
 	private ClientService service;
+
+	//used to know when to append and when to reset the mock file; //TODO will not work if we test with multiple endpoints in the same test run
+	private static final HashSet<String> seen = new HashSet<String>();
 
     public MockService(ClientService svc) {
     	this.service = svc;
@@ -66,40 +70,34 @@ public class MockService extends ClientService {
     	}
     	return response;
 	}
-    
-    private void recordResponse(Response response) {
-    	String mockFilepath = createPath();
-    	FileWriter fstream;
+
+	private void recordResponse(Response response) {
 		try {
-			File file = new File(mockFilepath);
-			File parentFolder = new File(file.getParent());
-			parentFolder.mkdirs(); 
-			file.createNewFile();
+			File file = getFile(true);
+			FileWriter fstream;
+
 			fstream = new FileWriter(file, true);
-	        BufferedWriter out = new BufferedWriter(fstream);
-	        out.write("<data type='record'>");
-	        out.write(serialize(response.getData()));
-	        out.write("</data>\n");
-	        out.close();
+			BufferedWriter out = new BufferedWriter(fstream);
+			out.write("<data type='record'>");
+			out.write(serialize(response.getData()));
+			out.write("</data>\n");
+			out.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
-    }
-    
-    private void recordResponse(Throwable response) {
-    	String mockFilepath = createPath();
-    	FileWriter fstream;
+		}
+	}
+
+	private void recordResponse(Throwable response) {
 		try {
-			File file = new File(mockFilepath);
-			File parentFolder = new File(file.getParent());
-			parentFolder.mkdirs(); 
-			file.createNewFile();
+			File file = getFile(true);
+			FileWriter fstream;
+
 			fstream = new FileWriter(file, true);
 	        BufferedWriter out = new BufferedWriter(fstream);
 	        out.write("<data type='throwable'>");
 	        out.write(serialize(response));
-	        out.write("</data>");
+	        out.write("</data>\n");
 	        out.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -141,31 +139,56 @@ public class MockService extends ClientService {
 		}
     }
 
-    
-    private Response replayResponse() {
-    	Response response = null;
-    	String mockFilepath = createPath();
-    	return response;
-    }
+	private Response replayResponse() {
+		Response response = null;
+		try {
+			File file = getFile(false);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return response;
+	}
 
 	private StackTraceElement getStackTraceElement() {
-		StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+		StackTraceElement last = null;
+		StackTraceElement[] stackTraceElements = Thread.currentThread()
+				.getStackTrace();
 		for (StackTraceElement trace : stackTraceElements) {
 			if (trace.getClassName().endsWith("Test")) {
-				return trace;
+
+				try {
+					if (Class.forName(trace.getClassName())
+							.getMethod(trace.getMethodName())
+							.isAnnotationPresent(Test.class))
+						last = trace;
+				} catch (Exception e) {
+				}
 			}
 		}
-		return null;
+		return last;
 	}
-	
-	private String createPath() {
+
+	private File getFile(boolean write) throws IOException {
 		StackTraceElement trace = getStackTraceElement();
 		String basePath = System.getProperty("user.dir");
 		String className = trace.getClassName().replace(".", File.separator);
 		String methodName = trace.getMethodName();
-		String path = new StringBuilder(basePath).append(File.separator).append("test").append(File.separator).append(className).append(File.separator).append(methodName).append(".mock").toString();
-
-		return path;
+		String path = new StringBuilder(basePath).append(File.separator)
+				.append("test").append(File.separator).append(className)
+				.append(File.separator).append(methodName).append(".mock")
+				.toString();
+		boolean reset = !seen.contains(path);
+		seen.add(path);
+		
+		File file = new File(path);
+		File parentFolder = new File(file.getParent());
+		parentFolder.mkdirs();
+		if (write && reset && file.exists())
+			file.delete();
+		if (!file.exists())
+			file.createNewFile();
+		return file;
 	}
 
 }
