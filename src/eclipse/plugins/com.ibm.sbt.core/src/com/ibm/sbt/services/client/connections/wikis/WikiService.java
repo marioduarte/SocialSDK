@@ -16,19 +16,25 @@
 
 package com.ibm.sbt.services.client.connections.wikis;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.ibm.sbt.services.client.ClientServicesException;
+import com.ibm.sbt.services.client.base.BaseService;
 import com.ibm.sbt.services.client.base.IFeedHandler;
 import com.ibm.sbt.services.client.base.datahandlers.EntityList;
-import com.ibm.sbt.services.client.connections.wikis.base.BaseService;
+import com.ibm.sbt.services.client.connections.wikis.base.options.WikiOptions;
+import com.ibm.sbt.services.client.connections.wikis.base.options.WikiOptionsEx;
+import com.ibm.sbt.services.client.connections.wikis.exceptions.RestServiceException;
+import com.ibm.sbt.services.client.connections.wikis.exceptions.UnauthenticatedException;
+import com.ibm.sbt.services.client.connections.wikis.exceptions.UnauthorizedException;
 import com.ibm.sbt.services.endpoints.Endpoint;
 
 /**
  * @author Mario Duarte
  *
  */
-public class WikiService extends BaseService<Wiki> {
+public class WikiService extends BaseService {
 	
 	public WikiService() {
 		super();
@@ -42,79 +48,102 @@ public class WikiService extends BaseService<Wiki> {
 		super(endpoint);
 	}
 	
+	
 	/**
 	 * This returns a list of wikis to which the authenticated user has access. 
-	 * @param parameters 
+	 * @param options Optional parameters. null means no optional parameters.
 	 * @return 
-	 * @throws ClientServicesException
+	 * @throws UnauthenticatedException 
+	 * @throws UnauthorizedException 
 	 */
-	public EntityList<Wiki> getAllWikis(Map<String, String> parameters) throws ClientServicesException {
+	public EntityList<Wiki> getAllWikis(WikiOptionsEx options) 
+			throws UnauthorizedException, UnauthenticatedException {
 		String requestUrl = new WikiUrl(endpoint).wikis().feed().build();
-		return getEntityList(requestUrl, parameters);
+		return getEntityList(requestUrl, options);
 	}
 	
 	/**
 	 * This returns a list of wikis to which everyone who can log into the Wikis application has access. 
-	 * @param parameters
+	 * @param options Optional parameters. null means no optional parameters.
 	 * @return
-	 * @throws ClientServicesException
+	 * @throws UnauthenticatedException 
+	 * @throws UnauthorizedException 
 	 */
-	public EntityList<Wiki> getPublicWikis(Map<String, String> parameters) throws ClientServicesException {
+	public EntityList<Wiki> getPublicWikis(WikiOptions options) 
+			throws UnauthorizedException, UnauthenticatedException {
 		String requestUrl = new WikiUrl(endpoint).wikis().publicx().build();
-		return getEntityList(requestUrl, parameters);
+		return getEntityList(requestUrl, options);
 	}
 	
 	/**
 	 * This returns a list of wikis of which the authenticated user is a member. 
-	 * @param parameters
+	 * @param options Optional parameters. null means no optional parameters.
 	 * @return
-	 * @throws ClientServicesException
+	 * @throws UnauthenticatedException 
+	 * @throws UnauthorizedException 
 	 */
-	public EntityList<Wiki> getMyWikis(Map<String, String> parameters) throws ClientServicesException {
+	public EntityList<Wiki> getMyWikis(WikiOptions options) 
+			throws UnauthorizedException, UnauthenticatedException {
 		String requestUrl = new WikiUrl(endpoint).myWikis().feed().build();
-		return getEntityList(requestUrl, parameters);
+		return getEntityList(requestUrl, options);
 	}
 	
 	/**
 	 * This returns a list of wikis to which everyone who can log into the Wikis application has access. 
-	 * @param parameters
+	 * @param options Optional parameters. null means no optional parameters.
 	 * @return
-	 * @throws ClientServicesException
+	 * @throws UnauthenticatedException 
+	 * @throws UnauthorizedException 
 	 */
-	public EntityList<Wiki> getWikisWithMostComments(Map<String, String> parameters) throws ClientServicesException {
+	public EntityList<Wiki> getWikisWithMostComments(WikiOptions options) 
+				throws UnauthorizedException, UnauthenticatedException {
 		String requestUrl = new WikiUrl(endpoint).anonymous().wikis().mostCommented().build();
-		return getEntityList(requestUrl, parameters);
+		return getEntityList(requestUrl, options);
 	}
 	
 	/**
 	 * This returns a list of wikis to which everyone who can log into the Wikis application has access. 
-	 * @param parameters
+	 * @param options Optional parameters. null means no optional parameters.
 	 * @return
-	 * @throws ClientServicesException
+	 * @throws UnauthenticatedException 
+	 * @throws UnauthorizedException 
 	 */
-	public EntityList<Wiki> getWikisWithMostRecommendations(Map<String, String> parameters) throws ClientServicesException {
+	public EntityList<Wiki> getWikisWithMostRecommendations(WikiOptions options) 
+				throws UnauthorizedException, UnauthenticatedException {
 		String requestUrl = new WikiUrl(endpoint).anonymous().wikis().mostRecommended().build();
-		return getEntityList(requestUrl, parameters);
+		return getEntityList(requestUrl, options);
 	}
 	
 	/**
 	 * This returns a list of wikis to which everyone who can log into the Wikis application has access. 
-	 * @param parameters
+	 * @param options Optional parameters. null means no optional parameters.
 	 * @return
-	 * @throws ClientServicesException
+	 * @throws UnauthenticatedException 
+	 * @throws UnauthorizedException 
 	 */
-	public EntityList<Wiki> getMostVisitedWikis(Map<String, String> parameters) throws ClientServicesException {
+	public EntityList<Wiki> getMostVisitedWikis(WikiOptions options) 
+				throws UnauthorizedException, UnauthenticatedException {
 		String requestUrl = new WikiUrl(endpoint).anonymous().wikis().mostVisited().build();
-		return getEntityList(requestUrl, parameters);
+		return getEntityList(requestUrl, options);
 	}
-
 	
 	@SuppressWarnings("unchecked")
-	protected EntityList<Wiki> getEntityList(String requestUrl, Map<String, String> parameters) throws ClientServicesException {
-		return (EntityList<Wiki>)getEntities(requestUrl, getParameters(parameters), getWikiFeedHandler());
+	protected EntityList<Wiki> getEntityList(String requestUrl, WikiOptions options) 
+			throws RestServiceException {
+		try {
+			return (EntityList<Wiki>)getEntities(requestUrl, convertOptions(options), getWikiFeedHandler());
+		}
+		catch(ClientServicesException e) {
+			throw RestServiceException.newInstance(e);
+		}
 	}
-	
+
+	private Map<String, String> convertOptions(WikiOptions options) {
+		if(options == null) return new HashMap<String, String>();
+		else return options.toMap();
+	}
+
 	protected IFeedHandler getWikiFeedHandler() {
-		return  new WikiFeedHandler(this);
+		return new WikiFeedHandler(this);
 	}
 }

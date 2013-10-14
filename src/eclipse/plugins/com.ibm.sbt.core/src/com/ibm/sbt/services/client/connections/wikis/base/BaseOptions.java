@@ -19,29 +19,33 @@ package com.ibm.sbt.services.client.connections.wikis.base;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ibm.sbt.services.client.base.BaseEntity;
-import com.ibm.sbt.services.endpoints.Endpoint;
-
 /**
  * @author Mario Duarte
  *
  */
-public abstract class BaseService<T extends BaseEntity> extends com.ibm.sbt.services.client.base.BaseService {
-
-	public BaseService() {
-		super();
+public abstract class BaseOptions {
+	private Map<String,String> params;
+	
+	public BaseOptions() {
+		this.params = new HashMap<String, String>();
 	}
 	
-	public BaseService(String endpoint) {
-		super(endpoint);
+	/**
+	 * 
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public <T extends BaseOptions> T setParam(String key, Object value) {
+		params.put(key, value.toString());
+		return (T)this;
 	}
 	
-	public BaseService(Endpoint endpoint) {
-		super(endpoint);
-	}
-	
-	protected Map<String, String> getParameters(Map<String, String> parameters) {
-		if(parameters == null) return new HashMap<String, String>();
-		else return parameters;
+	/**
+	 * @return the params
+	 */
+	public Map<String, String> toMap() {
+		return params;
 	}
 }
