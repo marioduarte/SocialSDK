@@ -1,7 +1,8 @@
 package com.ibm.sbt.services;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -33,7 +34,7 @@ public abstract class BaseUnitTest {
 
 	public BaseUnitTest() {
 		try {
-			properties.load(new FileInputStream("config\\test.properties"));
+			properties.load(new FileInputStream("config"+File.separator+"test.properties"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
