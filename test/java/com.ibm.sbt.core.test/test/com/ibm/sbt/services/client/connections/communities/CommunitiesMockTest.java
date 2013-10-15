@@ -1,18 +1,12 @@
 package com.ibm.sbt.services.client.connections.communities;
 
 import static org.junit.Assert.fail;
-
-import java.util.Random;
-
 import lib.MockEndpoint;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-import com.ibm.sbt.security.authentication.AuthenticationException;
 import com.ibm.sbt.services.BaseUnitTest;
 import com.ibm.sbt.services.client.ClientServicesException;
-import com.ibm.sbt.services.endpoints.ConnectionsBasicEndpoint;
 import com.ibm.sbt.services.endpoints.Endpoint;
 import com.ibm.sbt.services.endpoints.EndpointFactory;
 

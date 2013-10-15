@@ -8,11 +8,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintStream;
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -156,13 +153,12 @@ public class MockService extends ClientService {
 			return is.readObject();
 		} catch (ClassNotFoundException e) {
 			throw new IOException(e);
+		} finally {
+			is.close();
 		}
     }
 
 	private Response replayResponse() throws ClientServicesException {
-		
-		Response response = null;
-		
 		try {
 			BufferedReader r = getReader();
 			String line = r.readLine();
@@ -249,11 +245,13 @@ public class MockService extends ClientService {
 	private String getPath() {
 		StackTraceElement trace = getStackTraceElement();
 		String basePath = System.getProperty("user.dir");
-		String className = trace.getClassName().replace(".", File.separator);
+		String fullClassName = trace.getClassName().replace(".", File.separator);
+		String className = fullClassName.substring(fullClassName.lastIndexOf(File.separatorChar));
+		String packageName = fullClassName.substring(0, fullClassName.lastIndexOf(File.separatorChar));
 		String methodName = trace.getMethodName();
 		String path = new StringBuilder(basePath).append(File.separator)
-				.append("test").append(File.separator).append(className)
-				.append(File.separator).append(methodName).append(".mock")
+				.append("test").append(File.separator).append(packageName).append(File.separator).append("mockData").append(File.separator).append(className)
+				.append("_").append(methodName).append(".mock")
 				.toString();
 		return path;
 	}
