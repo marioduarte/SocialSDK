@@ -8,8 +8,7 @@ import com.ibm.sbt.services.endpoints.Endpoint;
 public class MockService extends ClientService {
 	
 	private enum MockMode { RECORD, REPLAY, PASSTHRU }
-	//private MockMode mode = MockMode.PASSTHRU;
-	private MockMode mode = MockMode.REPLAY;
+	private MockMode mode = System.getProperty("mockMode")!=null?MockMode.valueOf(System.getProperty("mockMode")):MockMode.PASSTHRU;
 	private ClientService service;
 	private MockSerializer serializer = new MockSerializer();
 
