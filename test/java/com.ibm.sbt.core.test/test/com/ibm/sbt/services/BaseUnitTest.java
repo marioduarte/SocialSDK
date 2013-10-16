@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Properties;
 
+import lib.MockEndpoint;
+
 import org.junit.After;
 import org.junit.Before;
 
@@ -17,6 +19,7 @@ import com.ibm.commons.runtime.Context;
 import com.ibm.commons.runtime.RuntimeFactory;
 import com.ibm.commons.runtime.impl.app.RuntimeFactoryStandalone;
 import com.ibm.sbt.services.endpoints.Endpoint;
+import com.ibm.sbt.services.endpoints.EndpointFactory;
 
 /**
  * BaseUnitTest class to initialize context and Endpoint. All junits should
@@ -31,6 +34,8 @@ public abstract class BaseUnitTest {
 	private Application application;
 	private Context context;
 	protected Properties properties = new Properties();
+	private String endpointName = "connections";
+	private boolean mocking = false;
 
 	public BaseUnitTest() {
 		try {

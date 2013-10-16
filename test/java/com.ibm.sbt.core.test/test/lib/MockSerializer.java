@@ -29,6 +29,7 @@ public class MockSerializer {
 	//used to know when to append and when to reset the mock file; //TODO will not work if we test with multiple endpoints in the same test run
 	private static final HashSet<String> seen = new HashSet<String>();
 	private static final HashMap<String, BufferedReader> replyStream = new HashMap<String, BufferedReader>();
+	private String endpointName;
 
 	public void recordResponse(Response response) {
 		try {
@@ -209,5 +210,13 @@ public class MockSerializer {
 				.append("_").append(methodName).append(".mock")
 				.toString();
 		return path;
+	}
+
+	public String getEndpointName() {
+		return endpointName;
+	}
+
+	public void setEndpointName(String endpointName) {
+		this.endpointName = endpointName;
 	}
 }

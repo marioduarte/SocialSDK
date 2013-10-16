@@ -22,6 +22,34 @@
 		</managed-property>
 	</managed-bean>
 	
+	<managed-bean>
+		<managed-bean-name>RecEnvironment</managed-bean-name>
+		<managed-bean-class>com.ibm.sbt.jslibrary.SBTEnvironment</managed-bean-class>
+		<managed-bean-scope>application</managed-bean-scope>
+		<managed-property>
+			<property-name>endpoints</property-name>
+			<value>connectionsRec:connections</value>
+		</managed-property>
+		<managed-property>
+			<property-name>properties</property-name>
+			<value></value>
+		</managed-property>
+	</managed-bean>
+	
+	<managed-bean>
+		<managed-bean-name>mockEnvironment</managed-bean-name>
+		<managed-bean-class>com.ibm.sbt.jslibrary.SBTEnvironment</managed-bean-class>
+		<managed-bean-scope>application</managed-bean-scope>
+		<managed-property>
+			<property-name>endpoints</property-name>
+			<value>connectionsMock:connections</value>
+		</managed-property>
+		<managed-property>
+			<property-name>properties</property-name>
+			<value></value>
+		</managed-property>
+	</managed-bean>
+	
 	<!-- Connections -->
 	<managed-bean>
 		<managed-bean-name>connections</managed-bean-name>
@@ -30,6 +58,76 @@
 		<managed-property>
 			<property-name>url</property-name>
 			<value>https://vhost0839.dc1.on.ca.compute.ihost.com:444</value>
+		</managed-property>
+		<managed-property>
+			<property-name>user</property-name>
+			<value>fadams</value>
+		</managed-property>
+		<managed-property>
+			<property-name>password</property-name>
+			<value>passw0rd</value>
+		</managed-property>
+		
+		<managed-property>
+			<property-name>credentialStore</property-name>
+			<value>CredStore</value>
+		</managed-property>
+		<managed-property>
+			<property-name>forceTrustSSLCertificate</property-name>
+			<value>true</value>
+		</managed-property>
+	</managed-bean>
+	
+	<managed-bean>
+		<managed-bean-name>connectionsMock</managed-bean-name>
+		<managed-bean-class>lib.MockEndpoint</managed-bean-class>
+		<managed-bean-scope>session</managed-bean-scope>
+		<managed-property>
+			<property-name>url</property-name>
+			<value>https://vhost0839.dc1.on.ca.compute.ihost.com:444</value>
+		</managed-property>
+		<managed-property>
+			<property-name>mockMode</property-name>
+			<value>replay</value>
+		</managed-property>
+		<managed-property>
+			<property-name>innerEndpoint</property-name>
+			<value>connections</value>
+		</managed-property>
+		<managed-property>
+			<property-name>user</property-name>
+			<value>fadams</value>
+		</managed-property>
+		<managed-property>
+			<property-name>password</property-name>
+			<value>passw0rd</value>
+		</managed-property>
+		
+		<managed-property>
+			<property-name>credentialStore</property-name>
+			<value>CredStore</value>
+		</managed-property>
+		<managed-property>
+			<property-name>forceTrustSSLCertificate</property-name>
+			<value>true</value>
+		</managed-property>
+	</managed-bean>
+	
+	<managed-bean>
+		<managed-bean-name>connectionsRec</managed-bean-name>
+		<managed-bean-class>lib.MockEndpoint</managed-bean-class>
+		<managed-bean-scope>session</managed-bean-scope>
+		<managed-property>
+			<property-name>url</property-name>
+			<value>https://vhost0839.dc1.on.ca.compute.ihost.com:444</value>
+		</managed-property>
+		<managed-property>
+			<property-name>mockMode</property-name>
+			<value>record</value>
+		</managed-property>
+		<managed-property>
+			<property-name>innerEndpoint</property-name>
+			<value>connections</value>
 		</managed-property>
 		<managed-property>
 			<property-name>user</property-name>

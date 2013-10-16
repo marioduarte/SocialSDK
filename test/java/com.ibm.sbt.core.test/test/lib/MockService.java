@@ -3,28 +3,24 @@ package lib;
 import com.ibm.sbt.services.client.ClientService;
 import com.ibm.sbt.services.client.ClientServicesException;
 import com.ibm.sbt.services.client.Response;
-import com.ibm.sbt.services.endpoints.Endpoint;
 
 public class MockService extends ClientService {
 	
 	private enum MockMode { RECORD, REPLAY, PASSTHRU }
-	private MockMode mode = System.getProperty("mockMode")!=null?MockMode.valueOf(System.getProperty("mockMode")):MockMode.PASSTHRU;
+	private MockMode mode;
 	private ClientService service;
 	private MockSerializer serializer = new MockSerializer();
 
-
     public MockService(ClientService svc) {
+    	this(svc, "passthru");
+    }
+
+    public MockService(ClientService svc, String mockMode) {
     	this.service = svc;
+    	this.endpoint = svc.getEndpoint();
+    	this.mode = MockMode.valueOf(mockMode.toUpperCase());
     }
 
-    public MockService(Endpoint endpoint) {
-        super(endpoint);
-    }
-
-    public MockService(String endpointName) {
-        super(endpointName);
-    }
-    
     @Override
 	public Response xhr(String method, Args args, Object content) throws ClientServicesException {
     	Response response = null;
