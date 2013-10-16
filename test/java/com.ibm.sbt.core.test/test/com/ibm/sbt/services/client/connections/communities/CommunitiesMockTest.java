@@ -1,16 +1,14 @@
 package com.ibm.sbt.services.client.connections.communities;
 
 import static org.junit.Assert.fail;
-import lib.MockEndpoint;
 
 import org.junit.Test;
 
 import com.ibm.sbt.services.BaseUnitTest;
 import com.ibm.sbt.services.client.ClientServicesException;
-import com.ibm.sbt.services.endpoints.Endpoint;
-import com.ibm.sbt.services.endpoints.EndpointFactory;
 
 public class CommunitiesMockTest extends BaseUnitTest {
+
 	protected static final String TEST_COMMUNITY_DESCRIPTION = "Test Community Description";
 	protected static final String NEW_COMMUNITY = "New Community "+ System.currentTimeMillis();
 
@@ -20,7 +18,7 @@ public class CommunitiesMockTest extends BaseUnitTest {
 		String uuid2 = null;
 		CommunityService svc = null;
 		try {
-			svc = createCommunityService();
+			svc = new CommunityService();
 			Community c = new Community(null);
 			c.setTitle(NEW_COMMUNITY);
 			c.setContent(TEST_COMMUNITY_DESCRIPTION);
@@ -29,15 +27,14 @@ public class CommunitiesMockTest extends BaseUnitTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());
-
 		}
+
 		try {
 			Community c = new Community(null);
 			c = new Community(null);
 			c.setTitle(NEW_COMMUNITY);
 			c.setContent(TEST_COMMUNITY_DESCRIPTION);
 			uuid2 = svc.createCommunity(c);
-
 		} catch (CommunityServiceException e) {
 			if (e.getCause() instanceof ClientServicesException
 					&& (((ClientServicesException) e.getCause())
@@ -67,14 +64,5 @@ public class CommunitiesMockTest extends BaseUnitTest {
 
 		}
 		fail("Duplicated creation did not fail");
-
-	}
-
-	private CommunityService createCommunityService() {
-		// TODO: autowrap context
-		Endpoint endpoint = EndpointFactory.getEndpoint("connections");
-		MockEndpoint mockEndpoint = new MockEndpoint(endpoint);
-		CommunityService service = new CommunityService(mockEndpoint);
-		return service;
 	}
 }
