@@ -1,6 +1,23 @@
+/*
+ * © Copyright IBM Corp. 2013
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at:
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
 package lib;
 
 import java.io.BufferedReader;
+
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -19,25 +36,47 @@ import org.apache.http.conn.EofSensorInputStream;
 import org.junit.Test;
 import org.w3c.dom.Node;
 
+import com.ibm.commons.runtime.Context;
 import com.ibm.commons.util.io.base64.Base64InputStream;
 import com.ibm.commons.util.io.base64.Base64OutputStream;
+import com.ibm.sbt.jslibrary.SBTEnvironment;
 import com.ibm.sbt.services.client.ClientServicesException;
 import com.ibm.sbt.services.client.Response;
 
+/**
+ * 
+ * @author Lorenzo Boccaccia
+ * @author Carlos Manias
+ *
+ */
 public class MockSerializer {
 
 	//used to know when to append and when to reset the mock file; //TODO will not work if we test with multiple endpoints in the same test run
 	private static final HashSet<String> seen = new HashSet<String>();
 	private static final HashMap<String, BufferedReader> replyStream = new HashMap<String, BufferedReader>();
-	private String endpointName;
+
+	public BufferedWriter getWriter() throws IOException{
+		File file = getFile(true);
+		FileWriter fstream;
+
+		fstream = new FileWriter(file, true);
+		BufferedWriter out = new BufferedWriter(fstream);
+		return out;
+	}
+
+	private BufferedReader getReader() throws IOException {
+		String path = getPath();
+		if (replyStream.containsKey(path)){
+			return replyStream.get(path);
+		}
+		BufferedReader ret = new BufferedReader(new FileReader(new File(path)));
+		replyStream.put(path,ret);
+		return ret;
+	}
 
 	public void recordResponse(Response response) {
 		try {
-			File file = getFile(true);
-			FileWriter fstream;
-
-			fstream = new FileWriter(file, true);
-			BufferedWriter out = new BufferedWriter(fstream);
+			BufferedWriter out = getWriter();
 			if (Node.class.isAssignableFrom(response.getData().getClass()))
 				out.write("xml:");
 			else if (EofSensorInputStream.class.isAssignableFrom(response.getData().getClass()))
@@ -61,11 +100,7 @@ public class MockSerializer {
 
 	public void recordResponse(Throwable response) {
 		try {
-			File file = getFile(true);
-			FileWriter fstream;
-
-			fstream = new FileWriter(file, true);
-	        BufferedWriter out = new BufferedWriter(fstream);
+			BufferedWriter out = getWriter();
 	        out.write("throwable:");
 	        out.write(serialize(response));
 	        out.write(":\n");
@@ -77,8 +112,6 @@ public class MockSerializer {
     }
 
     String serialize(EofSensorInputStream is) throws IOException {    	
-
-	
     	ByteArrayOutputStream w = new ByteArrayOutputStream();
     	
     	Base64OutputStream base64OutputStream = new Base64OutputStream(w);
@@ -87,8 +120,6 @@ public class MockSerializer {
     	System.out.println("CONVERTED OBJECT TO "+w.toString("UTF-8"));
     	return w.toString("UTF-8");
     }
-
-    
     
     String serialize(Object o) throws IOException {    	
     	if (o instanceof EofSensorInputStream) return serialize((EofSensorInputStream) o);
@@ -101,9 +132,8 @@ public class MockSerializer {
     	System.out.println("CONVERTED OBJECT TO "+w.toString("UTF-8"));
     	return w.toString("UTF-8");
     }
-
     
-    Object  deserialize(String o) throws IOException {
+    Object deserialize(String o) throws IOException {
     	ObjectInputStream is = new ObjectInputStream(new Base64InputStream(new ByteArrayInputStream(o.getBytes())));
     	try {
 			return is.readObject();
@@ -159,15 +189,12 @@ public class MockSerializer {
 		StackTraceElement[] stackTraceElements = Thread.currentThread()
 				.getStackTrace();
 		for (StackTraceElement trace : stackTraceElements) {
-			if (trace.getClassName().endsWith("Test")) {
-
-				try {
-					if (Class.forName(trace.getClassName())
-							.getMethod(trace.getMethodName())
-							.isAnnotationPresent(Test.class))
-						last = trace;
-				} catch (Exception e) {
-				}
+			try {
+				if (Class.forName(trace.getClassName())
+					.getMethod(trace.getMethodName())
+					.isAnnotationPresent(Test.class))
+				last = trace;
+			} catch (Exception e) {
 			}
 		}
 		return last;
@@ -188,15 +215,23 @@ public class MockSerializer {
 		return file;
 	}
 
-	private BufferedReader getReader() throws IOException {
-		String path = getPath();
-		if (replyStream.containsKey(path)){
-			return replyStream.get(path);
-		}
-		BufferedReader ret = new BufferedReader(new FileReader(new File(path)));
-		replyStream.put(path,ret);
-		return ret;
-	}
+	
+	private String getEndpointName(){
+		String endpointName="";
+    	Context context = Context.getUnchecked();
+    	if (context == null) {
+    		return null;
+    	}
+        String environment = context.getProperty("environment");
+        if(environment != null) {
+            SBTEnvironment env = (SBTEnvironment) context.getBean(environment);
+            SBTEnvironment.Endpoint[] endpointsArray = env.getEndpointsArray();
+            for(SBTEnvironment.Endpoint endpoint : endpointsArray){
+                endpointName = endpoint.getAlias();
+            }
+        }
+        return endpointName;
+    }
 	
 	private String getPath() {
 		StackTraceElement trace = getStackTraceElement();
@@ -205,18 +240,13 @@ public class MockSerializer {
 		String className = fullClassName.substring(fullClassName.lastIndexOf(File.separatorChar));
 		String packageName = fullClassName.substring(0, fullClassName.lastIndexOf(File.separatorChar));
 		String methodName = trace.getMethodName();
-		String path = new StringBuilder(basePath).append(File.separator)
-				.append("test").append(File.separator).append(packageName).append(File.separator).append("mockData").append(File.separator).append(className)
-				.append("_").append(methodName).append(".mock")
-				.toString();
+    	String endpointName = getEndpointName();
+		String path = new StringBuilder(basePath).append(File.separator).
+				append("test").append(File.separator).append(packageName).append(File.separator).
+				append("mockData").append(File.separator).
+				append(endpointName).append(File.separator).
+				append(className).append("_").append(methodName).append(".mock").
+				toString();
 		return path;
-	}
-
-	public String getEndpointName() {
-		return endpointName;
-	}
-
-	public void setEndpointName(String endpointName) {
-		this.endpointName = endpointName;
 	}
 }

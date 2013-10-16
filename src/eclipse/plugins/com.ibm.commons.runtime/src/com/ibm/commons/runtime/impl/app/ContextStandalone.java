@@ -104,8 +104,8 @@ public class ContextStandalone extends AbstractContext {
 
 	@Override
 	public String getProperty(String propertyName) {
-		String environment = System.getProperty("environment");
-		return StringUtil.isEmpty(environment)?getProperty(propertyName,null):environment;
+		String property = System.getProperty(propertyName);
+		return StringUtil.isEmpty(property)?getProperty(propertyName,null):property;
 	}
 
 }
