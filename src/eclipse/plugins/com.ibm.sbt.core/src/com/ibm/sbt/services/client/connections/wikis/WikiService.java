@@ -57,7 +57,7 @@ public class WikiService extends BaseService {
 	 * @throws UnauthorizedException 
 	 */
 	public EntityList<Wiki> getAllWikis(WikiOptionsEx options) 
-			throws UnauthorizedException, UnauthenticatedException {
+			throws UnauthorizedException, UnauthenticatedException, RestServiceException {
 		String requestUrl = new WikiUrl(endpoint).wikis().feed().build();
 		return getEntityList(requestUrl, options);
 	}
@@ -70,7 +70,7 @@ public class WikiService extends BaseService {
 	 * @throws UnauthorizedException 
 	 */
 	public EntityList<Wiki> getPublicWikis(WikiOptions options) 
-			throws UnauthorizedException, UnauthenticatedException {
+			throws UnauthorizedException, UnauthenticatedException, RestServiceException {
 		String requestUrl = new WikiUrl(endpoint).wikis().publicx().build();
 		return getEntityList(requestUrl, options);
 	}
@@ -83,7 +83,7 @@ public class WikiService extends BaseService {
 	 * @throws UnauthorizedException 
 	 */
 	public EntityList<Wiki> getMyWikis(WikiOptions options) 
-			throws UnauthorizedException, UnauthenticatedException {
+			throws UnauthorizedException, UnauthenticatedException, RestServiceException {
 		String requestUrl = new WikiUrl(endpoint).myWikis().feed().build();
 		return getEntityList(requestUrl, options);
 	}
@@ -96,7 +96,7 @@ public class WikiService extends BaseService {
 	 * @throws UnauthorizedException 
 	 */
 	public EntityList<Wiki> getWikisWithMostComments(WikiOptions options) 
-				throws UnauthorizedException, UnauthenticatedException {
+				throws UnauthorizedException, UnauthenticatedException, RestServiceException {
 		String requestUrl = new WikiUrl(endpoint).anonymous().wikis().mostCommented().build();
 		return getEntityList(requestUrl, options);
 	}
@@ -109,7 +109,7 @@ public class WikiService extends BaseService {
 	 * @throws UnauthorizedException 
 	 */
 	public EntityList<Wiki> getWikisWithMostRecommendations(WikiOptions options) 
-				throws UnauthorizedException, UnauthenticatedException {
+				throws UnauthorizedException, UnauthenticatedException, RestServiceException {
 		String requestUrl = new WikiUrl(endpoint).anonymous().wikis().mostRecommended().build();
 		return getEntityList(requestUrl, options);
 	}
@@ -122,7 +122,7 @@ public class WikiService extends BaseService {
 	 * @throws UnauthorizedException 
 	 */
 	public EntityList<Wiki> getMostVisitedWikis(WikiOptions options) 
-				throws UnauthorizedException, UnauthenticatedException {
+				throws UnauthorizedException, UnauthenticatedException, RestServiceException {
 		String requestUrl = new WikiUrl(endpoint).anonymous().wikis().mostVisited().build();
 		return getEntityList(requestUrl, options);
 	}

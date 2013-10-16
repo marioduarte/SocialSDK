@@ -48,4 +48,12 @@ public abstract class BaseOptions {
 	public Map<String, String> toMap() {
 		return params;
 	}
+	
+	/**
+	 * 
+	 * @param params
+	 */
+	public void loadMap(Map<String,String> params) {
+		this.params = params;
+	}
 }

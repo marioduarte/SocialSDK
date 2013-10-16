@@ -18,6 +18,7 @@ package com.ibm.sbt.services.client.connections.wikis.exceptions;
 
 import java.lang.reflect.Constructor;
 
+import com.ibm.commons.util.AbstractException;
 import com.ibm.sbt.services.client.ClientServicesException;
 
 
@@ -26,12 +27,13 @@ import com.ibm.sbt.services.client.ClientServicesException;
  * @author Mario Duarte
  *
  */
-public class RestServiceException extends RuntimeException {
+public class RestServiceException extends Exception {
 
 	private int statusCode;
 	private String message;
 	
-	protected RestServiceException() { }
+	protected RestServiceException() {
+	}
 
 	public static RestServiceException newInstance(ClientServicesException e) {
 		int responseStatusCode = e.getResponseStatusCode();
