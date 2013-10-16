@@ -17,6 +17,7 @@
 package lib;
 
 import java.io.BufferedReader;
+
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -42,6 +43,12 @@ import com.ibm.sbt.jslibrary.SBTEnvironment;
 import com.ibm.sbt.services.client.ClientServicesException;
 import com.ibm.sbt.services.client.Response;
 
+/**
+ * 
+ * @author Lorenzo Boccaccia
+ * @author Carlos Manias
+ *
+ */
 public class MockSerializer {
 
 	//used to know when to append and when to reset the mock file; //TODO will not work if we test with multiple endpoints in the same test run

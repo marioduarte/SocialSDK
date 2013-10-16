@@ -21,6 +21,11 @@ import com.ibm.sbt.services.client.ClientService;
 import com.ibm.sbt.services.client.ClientServicesException;
 import com.ibm.sbt.services.client.Response;
 
+/**
+ * 
+ * @author Carlos Manias
+ *
+ */
 public class MockService extends ClientService {
 	
 	private enum MockMode { RECORD, REPLAY, PASSTHRU }
