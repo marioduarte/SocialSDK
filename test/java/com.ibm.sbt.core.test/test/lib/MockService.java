@@ -7,7 +7,6 @@ import com.ibm.sbt.services.client.Response;
 public class MockService extends ClientService {
 	
 	private enum MockMode { RECORD, REPLAY, PASSTHRU }
-	//private MockMode mode = System.getProperty("mockMode")!=null?MockMode.valueOf(System.getProperty("mockMode")):MockMode.PASSTHRU;
 	private MockMode mode;
 	private ClientService service;
 	private MockSerializer serializer = new MockSerializer();
