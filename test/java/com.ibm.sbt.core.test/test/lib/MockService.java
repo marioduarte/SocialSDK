@@ -31,7 +31,7 @@ public class MockService extends ClientService {
 	    		return service.xhr(method, args, content);
 	    	case RECORD:
 	    		try {
-	    		response = service.xhr(method, args, content);
+	    			response = service.xhr(method, args, content);
 	    		} catch (ClientServicesException e) {
 	    			serializer.recordResponse(e);
 	    			throw e;

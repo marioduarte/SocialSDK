@@ -19,6 +19,7 @@ import org.apache.http.conn.EofSensorInputStream;
 import org.junit.Test;
 import org.w3c.dom.Node;
 
+import com.ibm.commons.runtime.Context;
 import com.ibm.commons.util.io.base64.Base64InputStream;
 import com.ibm.commons.util.io.base64.Base64OutputStream;
 import com.ibm.sbt.services.client.ClientServicesException;
@@ -205,10 +206,13 @@ public class MockSerializer {
 		String className = fullClassName.substring(fullClassName.lastIndexOf(File.separatorChar));
 		String packageName = fullClassName.substring(0, fullClassName.lastIndexOf(File.separatorChar));
 		String methodName = trace.getMethodName();
-		String path = new StringBuilder(basePath).append(File.separator)
-				.append("test").append(File.separator).append(packageName).append(File.separator).append("mockData").append(File.separator).append(className)
-				.append("_").append(methodName).append(".mock")
-				.toString();
+    	String environment = Context.get().getProperty("environment");
+		String path = new StringBuilder(basePath).append(File.separator).
+				append("test").append(File.separator).append(packageName).append(File.separator).
+				append("mockData").append(File.separator).
+				//append(environment).append(File.separator).
+				append(className).append("_").append(methodName).append(".mock").
+				toString();
 		return path;
 	}
 

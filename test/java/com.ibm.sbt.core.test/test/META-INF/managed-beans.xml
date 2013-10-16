@@ -23,7 +23,7 @@
 	</managed-bean>
 	
 	<managed-bean>
-		<managed-bean-name>RecEnvironment</managed-bean-name>
+		<managed-bean-name>recEnvironment</managed-bean-name>
 		<managed-bean-class>com.ibm.sbt.jslibrary.SBTEnvironment</managed-bean-class>
 		<managed-bean-scope>application</managed-bean-scope>
 		<managed-property>
