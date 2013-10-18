@@ -14,20 +14,18 @@
  * permissions and limitations under the License.
  */
 
-package com.ibm.sbt.services.client.connections.wikis.base;
+package com.ibm.sbt.services.client.base;
 
 import org.w3c.dom.Node;
 
 import com.ibm.sbt.services.client.Response;
-import com.ibm.sbt.services.client.base.AtomEntity;
-import com.ibm.sbt.services.client.base.BaseService;
-import com.ibm.sbt.services.client.base.IFeedHandler;
+import com.ibm.sbt.services.client.base.datahandlers.AtomEntityList;
 
 /**
  * @author Mario Duarte
  *
  */
-public abstract class AtomFeedHandler<T extends AtomEntity> implements IFeedHandler {
+public abstract class AtomFeedHandler<T extends AtomEntity> implements IFeedHandler<T> {
 
 	private BaseService service;
 	

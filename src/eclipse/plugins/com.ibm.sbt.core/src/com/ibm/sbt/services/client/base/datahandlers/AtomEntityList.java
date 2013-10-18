@@ -14,7 +14,7 @@
  * permissions and limitations under the License.
  */
 
-package com.ibm.sbt.services.client.connections.wikis.base;
+package com.ibm.sbt.services.client.base.datahandlers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,15 +27,14 @@ import com.ibm.sbt.services.client.base.AtomEntity;
 import com.ibm.sbt.services.client.base.ConnectionsConstants;
 import com.ibm.sbt.services.client.base.ConnectionsFeedXpath;
 import com.ibm.sbt.services.client.base.IFeedHandler;
-import com.ibm.sbt.services.client.base.datahandlers.XmlDataHandler;
 
 /**
  * @author Mario Duarte
  *
  */
-public class AtomEntityList<T extends AtomEntity> extends com.ibm.sbt.services.client.base.datahandlers.EntityList<T> {
+public class AtomEntityList<T extends AtomEntity> extends EntityList<T> {
 
-	public AtomEntityList(Response requestData, IFeedHandler feedHandler) {
+	public AtomEntityList(Response requestData, IFeedHandler<T> feedHandler) {
 		super(requestData, feedHandler);
 	}
 	

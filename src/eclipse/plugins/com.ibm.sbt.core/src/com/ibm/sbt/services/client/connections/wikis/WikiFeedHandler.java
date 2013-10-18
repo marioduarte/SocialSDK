@@ -18,9 +18,9 @@ package com.ibm.sbt.services.client.connections.wikis;
 
 import org.w3c.dom.Node;
 
+import com.ibm.sbt.services.client.base.AtomFeedHandler;
 import com.ibm.sbt.services.client.base.BaseService;
 import com.ibm.sbt.services.client.base.ConnectionsConstants;
-import com.ibm.sbt.services.client.connections.wikis.base.AtomFeedHandler;
 
 /**
  * @author Mario Duarte

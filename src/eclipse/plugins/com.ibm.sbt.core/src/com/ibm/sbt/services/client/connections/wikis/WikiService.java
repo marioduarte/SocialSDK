@@ -16,19 +16,20 @@
 
 package com.ibm.sbt.services.client.connections.wikis;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.ibm.sbt.services.client.ClientServicesException;
+import com.ibm.sbt.services.client.base.BaseService;
 import com.ibm.sbt.services.client.base.IFeedHandler;
 import com.ibm.sbt.services.client.base.datahandlers.EntityList;
-import com.ibm.sbt.services.client.connections.wikis.base.BaseService;
 import com.ibm.sbt.services.endpoints.Endpoint;
 
 /**
  * @author Mario Duarte
  *
  */
-public class WikiService extends BaseService<Wiki> {
+public class WikiService extends BaseService {
 	
 	public WikiService() {
 		super();
@@ -114,7 +115,12 @@ public class WikiService extends BaseService<Wiki> {
 		return (EntityList<Wiki>)getEntities(requestUrl, getParameters(parameters), getWikiFeedHandler());
 	}
 	
-	protected IFeedHandler getWikiFeedHandler() {
-		return  new WikiFeedHandler(this);
+	protected Map<String, String> getParameters(Map<String, String> parameters) {
+		if(parameters == null) return new HashMap<String, String>();
+		else return parameters;
+	}
+	
+	protected IFeedHandler<Wiki> getWikiFeedHandler() {
+		return new WikiFeedHandler(this);
 	}
 }
