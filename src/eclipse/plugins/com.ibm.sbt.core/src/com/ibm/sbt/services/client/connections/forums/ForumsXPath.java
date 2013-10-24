@@ -37,14 +37,19 @@ public enum ForumsXPath implements FieldEntry{
 	actorName("./author/name"),
 	actorUserid("./author/snx:userid"),
 	actorUserState("./author/snx:userState"),
+	contributorEmail("./contributor/email"),
+	contributorName("./contributor/name"),
+	contributorUserid("./contributor/snx:userid"),
+	contributorUserState("./contributor/snx:userState"),
 	title("./title"),
-	tags("./category/@term"), 
+	tags("./a:category[not(@scheme)]/@term"),  
 	flag("./a:category[@scheme=\"http://www.ibm.com/xmlns/prod/sn/flags\"]/@term"),
 	content("./content"),
 	topicUrl("./link"),
 	permissions("./snx:permissions"),
 	inReplyTo("./thr:in-reply-to/@ref"),
 	selfUrl("./a:link[@rel=\"self\"]/@href"),
+	alternateUrl("./a:link[@rel=\"alternate\"]/@href"),
 	moderation("./snx:moderation/@status"),
 	threadCount("./link[@rel='replies']/@thr:count"),
 	tagEntry("/app:categories/a:category"),
@@ -52,6 +57,8 @@ public enum ForumsXPath implements FieldEntry{
 	frequency("./@snx:frequency"),
 	intensity("./@snx:intensityBin"), 
 	visibility("./@snx:visibilityBin"),
+	ThreadRecommendationCount("./a:category[@term='ThreadRecommendationCount'][@scheme=\"http://www.ibm.com/xmlns/prod/sn/flags\"]/@label"),
+	RecommendationCount("./a:link[@rel=\"recommendations\"]/@snx:recommendation")
 	;
 
 

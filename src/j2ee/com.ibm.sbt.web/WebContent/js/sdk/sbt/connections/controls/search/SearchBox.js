@@ -1,5 +1,5 @@
 /*
- * © Copyright IBM Corp. 2013
+ * ï¿½ Copyright IBM Corp. 2013
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
  * you may not use this file except in compliance with the License. 
@@ -42,6 +42,11 @@ define(["../../../declare", "../../../lang", "../../../dom", "../../../widget/_T
         /**Selected row is used for keyboard navigation in the applications pop up*/
 		_selectedRow : -1,
 		
+		/** This list is used to keep track of selected members **/
+		_members : [],
+		
+		
+		
         /**
          * @method constructor The constructor for the SearchBox class
          * @param args
@@ -59,7 +64,13 @@ define(["../../../declare", "../../../lang", "../../../dom", "../../../widget/_T
 		postCreate: function(args){
 			this.createDefaultRenderer(args);
 			this.domNode = this.renderer.getDomNode(this);
-			this.renderer.render(this,this.domNode,{});	
+			this.renderer.render(this,this.domNode,{});
+			
+			
+			if (this.memberList) {
+				// Create member list
+				this.renderer.renderMemberList(this.domNode);
+			}
 		},
 		/**
 		 * Creates a SearchBoxRenderer and sets it as the renderer for this class.
@@ -111,7 +122,7 @@ define(["../../../declare", "../../../lang", "../../../dom", "../../../widget/_T
 		setSelectedApplication: function(element,object,event){
 			this.searchBoxAction.setSelectedApplication(element,object,event,this);
 		},
-		
+
 		/**
 		 * When the user hovers over an application in the applications pop up, the background gets highlighted
 		 * @method displayHighlight
@@ -121,6 +132,17 @@ define(["../../../declare", "../../../lang", "../../../dom", "../../../widget/_T
 		 */
 		displayHighlight: function(element,object,event){
 			this.searchBoxAction.highLight(element,object,event);
+		},
+		
+		/**
+		 * Closes a member item (by removing it from its parent; the member list)
+		 * @method closeMemberItem
+		 * @param element  The member list item
+		 * @param object 
+		 * @param event  The Event 
+		 */
+		closeMemberItem: function(element,object,event){
+			this.searchBoxAction.closeMemberItem(this, element,object,event);
 		},
 		
 		/**
@@ -164,7 +186,7 @@ define(["../../../declare", "../../../lang", "../../../dom", "../../../widget/_T
 			this.searchBoxAction.onKeyPress(element, obj, event, this);
 		},
 		
-			suggest: function(element, obj, event){
+		suggest: function(element, obj, event){
 			if(this.searchSuggest == "on"){
 				this.searchBoxAction.suggest(event, this);
 			}			
@@ -175,6 +197,12 @@ define(["../../../declare", "../../../lang", "../../../dom", "../../../widget/_T
 		 * this should be overridden to change the action 
 		 * of the event handler function  */
 		searchBoxAction : {
+			
+			_appsPopUp: null,
+			
+			_suggestionPopUp: null,
+			
+			_searchInput: null,
 			
 			/**
 			 * Handles keyboard navigation 
@@ -219,11 +247,60 @@ define(["../../../declare", "../../../lang", "../../../dom", "../../../widget/_T
 			},
 			
 			/**
+			 * Closes a member item (by removing it from its parent; the member list)
+			 * @method closeMemberItem
+			 * @param context
+			 * @param element  The member list item
+			 * @param object 
+			 * @param event  The Event 
+			 */
+			closeMemberItem: function(context, element,object,event){
+				// Get parent node
+				var item = event.target.parentNode;
+
+				// Prepare HTML for comparison
+				var memberNode = item.parentNode;
+				var memberNodeHtml = memberNode.innerHTML;
+				memberNodeHtml = memberNodeHtml.replace(/\s+/g, '');
+				memberNodeHtml = memberNodeHtml.replace(/ /g, '');
+				
+				// Remove member from list
+				for (var i = 0; i < context._members.length; i++) {
+					var member = context._members[i];
+					var html = member.html;
+					
+					// Skip null entries (null entries represent entries that have been deleted)
+					if (html == null) {
+						continue;
+					}
+					
+					// Remove dojo action listeners
+					html = html.replace(/data-dojo-attach-event=".*"/, "");
+					html = html.replace(/data-dojo-attach-event='.*'/, "");
+					
+					// Remove whitespace
+					html = html.replace(/\s+/g, '');
+					html = html.replace(/ /g, ' ');
+					
+					// Compare strings
+					if (html == memberNodeHtml) {
+						// Delete objects by setting their properties to null
+						context._members[i].html = null;
+						context._members[i].id = null;
+						context._members[i].name = null;
+						break;
+					}
+				}
+				
+				// Remove it
+				item.parentNode.removeChild(item);
+			},
+			
+			/**
 			 * Opens the pop up showing a list of applications
 			 * @method renderPopUp 
 			 * @param self Context
 			 */
-			_appsPopUp: null,
 			renderPopUp: function(self){
 				
 				if(this._suggestionPopUp ){
@@ -258,15 +335,30 @@ define(["../../../declare", "../../../lang", "../../../dom", "../../../widget/_T
 				this.removeHighlight(element, object, event);
 				self.selectedApplication = element.children[1].textContent;
 				self.renderer.removePopUp(self.domNode,this._appsPopUp);
-				self.renderer.changeSelectedApplication(element.children[1].textContent);
+				self.renderer.changeSelectedApplication(element.children[1].textContent,element.children[0].children[0]);
 			},
 			
-			_suggestionPopUp: null,
+			
 			setSuggestedSearch: function(event,popUp,context){
 				var value = event.target.textContent;
-				var input = document.getElementById("com.ibm.sbt.search.input");
-				input.value = value;
+				var id = event.target.id;
+				var input = this._searchInput;
+
 				this.searchQuery = value;
+				
+				// Member list feature enabled
+				if (context.memberList) {
+					// We don't want to display the suggested search term (instead
+					// we will just add it to the members list - see below)
+					input.value = "";
+					
+					// Create member list item
+					context.renderer.renderMemberListItem(context, value, id);
+
+				} else {
+					input.value = value;
+				}
+				
 				popUp.innerHTML = "";
 				context.renderer.removeSuggestionPopUp(context.domNode,popUp);
 			},
@@ -310,38 +402,64 @@ define(["../../../declare", "../../../lang", "../../../dom", "../../../widget/_T
 			 * @param context the context this
 			 */
 			suggest: function(event,context){
+				
 				var applicationParam = context.selectedApplication.toLocaleLowerCase();
             	applicationParam = applicationParam.replace(/ /g,'');
-				var inputBox = event.target;
+				
+            	var inputBox = event.target;
+				this._searchInput = inputBox;
+				
 				var query = inputBox.value;
 				var popUp = context.renderer.renderSuggestionPopUp(context,context.domNode);
 				this._suggestionPopUp = popUp;
+				
 				popUp.innerHTML = "";
-				var requestArgs = {"component": applicationParam};
-				searchService = new SearchService();
-			    var promise = searchService.getMyResults(query,requestArgs);
-
-		        promise.then(
-		            function(results) {
-		            	
-		            	for(var i=0;i<results.length;i++){
-		            		var row = document.createElement("tr");
-		            		var data = document.createElement("td");
-		            		data.innerHTML = results[i].getTitle();
-		            		data.style = "cursor:pointer";
-		            		data.onclick = function (event) { 
-		            			
-		            			context.searchBoxAction.setSuggestedSearch(event,popUp,context);
-		            		};    		
-		            		row.appendChild(data);
-		            		popUp.appendChild(row);
-		            	}
-
-		            },
-		            function(error) {
-		                console.log(error);
-		            }
+				
+				var requestArgs = {};
+				
+				if(context.constraint){
+					requestArgs = {"component": applicationParam, constraint: context.constraint };
+				}else{
+					requestArgs = {"component": applicationParam};
+				}
+	
+				if(query && query != ""){
+					
+					searchService = new SearchService();
+				    var promise = searchService.getMyResults(query,requestArgs);
+	
+			        promise.then(
+			            function(results) {
+			            	context.searchBoxAction.handleSuggestResult(results,context,popUp);
+			            },
+			            function(error) {
+			                console.log(error);
+			            }
 		        );
+			}
+			},
+			
+			/**
+			 * 
+			 * @method handleSuggestResult
+			 * @param results the results from the suggested search
+			 * @param context the This of the outer class
+			 * @param popUp the popUp Element where results are displayed 
+			 */
+			handleSuggestResult: function(results,context,popUp){
+				for(var i=0;i<results.length;i++){
+            		var row = document.createElement("tr");
+            		var data = document.createElement("td");
+            		data.innerHTML = results[i].getTitle();
+            		data.id = results[i].getId();
+            		data.style = "cursor:pointer";
+            		data.onclick = function (event) { 
+            			
+            			context.searchBoxAction.setSuggestedSearch(event,popUp,context);
+            		};    		
+            		row.appendChild(data);
+            		popUp.appendChild(row);
+            	}
 			},
 			
 			/**
@@ -365,18 +483,36 @@ define(["../../../declare", "../../../lang", "../../../dom", "../../../widget/_T
 				
             	//if this control is going to retrieve the search results from the server
 				if(context.type == "full"){
-					var requestArgs = {"component": applicationParam};
+					var requestArgs = {};
+					
+					if(context.constraint){
+						requestArgs = {"component": applicationParam, constraint: context.constraint }; 
+					}else{
+						requestArgs = {"component": applicationParam};
+					}
+					
 					searchService = new SearchService();
 				    var promise = searchService.getMyResults(context.searchQuery,requestArgs);
 				    
 				    var self = context;
 			        promise.then(
 			            function(results) {
-			            	var evt = document.createEvent("Event");
-			            	evt.initEvent("searchResultEvent",true,true);
-			            	evt.results = results;
-			            	self.domNode.dispatchEvent(evt);
-			            	evt = null;
+			            	if (context.memberList) {
+			            		// If the member list feature is enabled then we need
+			            		// to use a different search result event since we want the
+			            		// members to be added to the members list and NOT
+			            		// just displayed in the results table
+			            		for(var i = 0; i < results.length; i++) {
+			            			// Render each item in the search results
+			            			context.renderer.renderMemberListItem(context, results[i].getTitle(), results[i].getId());
+			            		}	   
+			            	} else {
+			            		var evt = document.createEvent("Event");
+			            		evt.initEvent("searchResultEvent",true,true);
+			            		evt.results = results;
+			            		self.domNode.dispatchEvent(evt);
+			            		evt = null;				
+			            	}
 			            },
 			            function(error) {
 			                console.log(error);
@@ -385,7 +521,7 @@ define(["../../../declare", "../../../lang", "../../../dom", "../../../widget/_T
 				}else {
 					//use another component to retrieve
 					var evt = document.createEvent("Event");
-	            	evt.initEvent("searchReadyEvent",true,true);
+	            	evt.initEvent("searchResultEvent",true,true);
 	            	evt.selectedApplication = applicationParam;
 	            	evt.searchQuery = context.searchQuery;
 	            	

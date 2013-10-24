@@ -6,7 +6,7 @@
 						<tbody>
 							<tr>
 								<td>
-								<div class="lotusHidden">${nls.refine}</div>
+									<div class="lotusHidden">${nls.refine}</div>
 									<div>
 										<a data-dojo-attach-event="onclick: handleClick" class="lotusScope" href="javascript:;">
 											<img src="images/blank.gif?etag=20120919.054848"
@@ -19,7 +19,7 @@
 								
 								<td>
 									<span><label for="input" style="display:none;">text</label>
-										<input id="input" type="text" data-dojo-attach-event="blur: setSearchQuery" class="lotusText lotusInactive" />
+										<input id="input" type="text" data-dojo-attach-event="onkeyup: suggest, blur: setSearchQuery" class="lotusText lotusInactive" />
 									</span>
 								</td>
 								

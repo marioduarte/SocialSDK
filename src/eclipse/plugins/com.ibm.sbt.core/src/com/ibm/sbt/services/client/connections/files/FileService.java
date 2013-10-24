@@ -18,6 +18,7 @@ package com.ibm.sbt.services.client.connections.files;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import org.xml.sax.InputSource;
 import com.ibm.commons.util.StringUtil;
 import com.ibm.sbt.services.client.base.BaseService;
 import com.ibm.sbt.services.client.base.transformers.TransformerException;
+import com.ibm.sbt.services.client.connections.communities.CommunityServiceException;
 import com.ibm.sbt.services.client.connections.files.model.FileEntryXPath;
 import com.ibm.sbt.services.client.connections.files.FileServiceException;
 import com.ibm.sbt.services.client.connections.files.model.FileCommentParameterBuilder;
@@ -49,6 +51,7 @@ import com.ibm.sbt.services.client.connections.files.transformers.ModerationTran
 import com.ibm.sbt.services.client.connections.files.transformers.MultipleFileTransformer;
 import com.ibm.sbt.services.client.connections.files.util.Messages;
 import com.ibm.sbt.services.client.ClientService.ContentStream;
+import com.ibm.sbt.services.client.ClientServicesException;
 import com.ibm.sbt.services.client.Response;
 import com.ibm.sbt.services.client.ClientService;
 import com.ibm.sbt.services.endpoints.Endpoint;
@@ -272,12 +275,183 @@ public class FileService extends BaseService {
         Document payload = this.constructPayloadForComments(comment);
         try {
             Response result = (Response) super.createData(requestUri, null, new ClientService.ContentXml(payload,"application/atom+xml"));
-            return (Comment)new CommentFeedHandler().createEntity(result);
+            return (Comment)new CommentFeedHandler(this).createEntity(result);
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInCreatingComment);
         }
     }
 
+    /**
+     * Method to add comments to a Community file
+     * <p>
+     * Rest API used : 
+     * /files/basic/api/communitylibrary/<communityId>/document/<fileId>/feed
+     * 
+     * @param fileId
+     * @param comment
+     * @param communityId
+     * @return Comment
+     * @throws FileServiceException
+     * @throws TransformerException
+     */
+    public Comment addCommentToCommunityFile(String fileId, String comment, String communityId) throws FileServiceException, TransformerException { 
+    	return addCommentToCommunityFile(fileId, comment, communityId, null);
+    }
+    
+    /**
+     * Method to add comments to a Community file
+     * <p>
+     * Rest API used : 
+     * /files/basic/api/communitylibrary/<communityId>/document/<fileId>/feed
+     * 
+     * @param fileId
+     * @param comment
+     * @param communityId
+     * @param params
+     * @return Comment
+     * @throws FileServiceException
+     * @throws TransformerException
+     */
+    public Comment addCommentToCommunityFile(String fileId, String comment, String communityId,
+            Map<String, String> params) throws FileServiceException, TransformerException {
+        String accessType = AccessType.AUTHENTICATED.getAccessType();
+        SubFilters subFilters = new SubFilters();
+        String category = null;
+        if (StringUtil.isEmpty(fileId)) {
+            throw new FileServiceException(null, Messages.Invalid_FileId);
+        }
+        if (StringUtil.isEmpty(communityId) || StringUtil.equalsIgnoreCase(communityId, null)) {
+        	throw new FileServiceException(null, Messages.Invalid_CommunityId);
+        }
+        subFilters.setFileId(fileId);
+        subFilters.setCommunityLibraryId(communityId);
+        String resultType = ResultType.FEED.getResultType();
+        String requestUri = FileServiceURIBuilder.constructUrl(FileServiceURIBuilder.FILES.getBaseUrl(), accessType, category, null, 
+        		null, subFilters, resultType);
+        Document payload = this.constructPayloadForComments(comment);
+        try {
+            Response result = (Response) super.createData(requestUri, null, new ClientService.ContentXml(payload,"application/atom+xml"));
+            return (Comment)new CommentFeedHandler(this).createEntity(result);
+        } catch (Exception e) {
+            throw new FileServiceException(e, Messages.MessageExceptionInCreatingComment);
+        }
+    }
+    
+    /**
+	 * Method to get a list of Community Files
+	 * @param communityId
+	 * @param params
+	 * @return FileList
+	 * @throws CommunityServiceException
+	 */
+	public FileList getCommunityFiles(String communityId, HashMap<String, String> params) throws FileServiceException {
+		String accessType = AccessType.AUTHENTICATED.getAccessType();
+		SubFilters subFilters = new SubFilters();
+        if (StringUtil.isEmpty(communityId)) {
+        	throw new FileServiceException(null, Messages.Invalid_CommunityId);
+        }
+        if(null == params){
+			 params = new HashMap<String, String>();
+		}
+        subFilters.setCommunityLibraryId(communityId);
+        String resultType = ResultType.FEED.getResultType();
+		String requestUrl = FileServiceURIBuilder.constructUrl(FileServiceURIBuilder.FILES.getBaseUrl(), accessType, null, null,
+                null, subFilters, resultType); 
+		try {
+			return (FileList) super.getEntities(requestUrl, params, new FileFeedHandler(this)); 
+		} catch (ClientServicesException e) {
+			throw new FileServiceException(e, Messages.MyCommunityFilesException);
+		}
+	}
+	
+	/**
+	 * Method to get a Community File
+	 * @param communityId
+	 * @param fileId
+	 * @return File
+	 * @throws FileServiceException
+	 */
+	public File getCommunityFile(String communityId, String fileId) throws FileServiceException {
+		return getCommunityFile(communityId, fileId, null);
+	}
+	
+	/**
+	 * Method to get a Community File
+	 * @param communityId
+	 * @param fileId
+	 * @param params
+	 * @return File
+	 * @throws FileServiceException
+	 */
+	public File getCommunityFile(String communityId, String fileId, HashMap<String, String> params) throws FileServiceException {
+		String accessType = AccessType.AUTHENTICATED.getAccessType();
+		SubFilters subFilters = new SubFilters();
+		if (StringUtil.isEmpty(fileId)) {
+        	throw new FileServiceException(null, Messages.Invalid_FileId);
+        }
+		if (StringUtil.isEmpty(communityId)) {
+        	throw new FileServiceException(null, Messages.Invalid_CommunityId);
+        }
+        if(null == params){
+			 params = new HashMap<String, String>();
+		}
+        subFilters.setCommunityLibraryId(communityId);
+        subFilters.setFileId(fileId);
+        String resultType = ResultType.ENTRY.getResultType();
+		String requestUrl = FileServiceURIBuilder.constructUrl(FileServiceURIBuilder.FILES.getBaseUrl(), accessType, null, null,
+                null, subFilters, resultType); 
+		try {
+			return (File) super.getEntity(requestUrl, params, new FileFeedHandler(this)); 
+		} catch (ClientServicesException e) {
+			throw new FileServiceException(e, Messages.MyCommunityFilesException);
+		} catch (IOException e) {
+			throw new FileServiceException(e, Messages.MyCommunityFilesException);
+		}
+	}
+    
+	/**
+	 * Method to update Community File's Metadata
+	 * <p>
+	 * Rest API used : 
+	 * /files/basic/api/library/<communityLibraryId>/document/<fileId>/entry
+	 * <p>
+	 * @param fileEntry
+	 * @param communityLibraryId
+	 * @param params
+	 * @return File
+	 * @throws FileServiceException
+	 * @throws TransformerException
+	 */
+	public File updateCommunityFileMetadata(File fileEntry, String communityLibraryId, Map<String, String> params) throws FileServiceException, TransformerException {
+		if (fileEntry == null) {
+            throw new FileServiceException(null, Messages.Invalid_File);
+        }
+        if (StringUtil.isEmpty(fileEntry.getFileId())) {
+            throw new FileServiceException(null, Messages.Invalid_FileId);
+        }
+        if (StringUtil.isEmpty(communityLibraryId)) {
+            throw new FileServiceException(null, Messages.Invalid_CommunityLibraryId);
+        }
+        String accessType = AccessType.AUTHENTICATED.getAccessType();
+        SubFilters subFilters = new SubFilters();
+        subFilters.setFileId(fileEntry.getFileId());
+        subFilters.setLibraryId(communityLibraryId);
+        String resultType = ResultType.ENTRY.getResultType();
+        String requestUri = FileServiceURIBuilder.constructUrl(FileServiceURIBuilder.FILES.getBaseUrl(), accessType, null, null,
+                null, subFilters, resultType); // we pass null value for non applicable types.
+        
+        Document updateFilePayload = null;
+        if (fileEntry.getFieldsMap() != null && !fileEntry.getFieldsMap().isEmpty()) {
+            updateFilePayload = this.constructPayload(fileEntry.getFileId(), fileEntry.getFieldsMap());
+        }
+        try {
+            Response result = (Response) super.updateData(requestUri, params, new ClientService.ContentXml(
+            		updateFilePayload, "application/atom+xml"), null);
+            return (File) new FileFeedHandler(this).createEntity(result);
+        } catch (Exception e) {
+            throw new FileServiceException(e, Messages.MessageExceptionInUpdate);
+        }
+	}
     /**
      * addFilesToFolder
      * <p>
@@ -318,7 +492,7 @@ public class FileService extends BaseService {
         try {
             Response result;
             result = (Response) super.createData(requestUri, params, headers, payload);
-            return new FileFeedHandler().createEntityList(result);
+            return new FileFeedHandler(this).createEntityList(result);
             
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageGenericException);
@@ -483,7 +657,7 @@ public class FileService extends BaseService {
         try {
             Response result = (Response) super.createData(requestUri, params, headers, new ClientService.ContentXml(
                     payload, "application/atom+xml"));
-            return (Comment) new CommentFeedHandler().createEntity(result);
+            return (Comment) new CommentFeedHandler(this).createEntity(result);
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInCreatingComment);
         }
@@ -525,7 +699,7 @@ public class FileService extends BaseService {
             Response result = (Response) super.createData(requestUri, null,
                     new ClientService.ContentXml(
                             payload, "application/atom+xml"));
-            return (File) new FileFeedHandler().createEntity(result);
+            return (File) new FileFeedHandler(this).createEntity(result);
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInCreatingFolder);
         }
@@ -931,7 +1105,7 @@ public class FileService extends BaseService {
 
         FileList fileEntries = null;
         try {
-            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler());
+            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -950,7 +1124,7 @@ public class FileService extends BaseService {
 
         CommentList commentEntries = null;
         try {
-            commentEntries = (CommentList) getEntities(requestUri, params, new CommentFeedHandler());
+            commentEntries = (CommentList) getEntities(requestUri, params, new CommentFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -1015,7 +1189,7 @@ public class FileService extends BaseService {
                     ResultType.ENTRY.getResultType());
 
             try {
-                return (File) super.getEntity(requestUri, parameters, new FileFeedHandler());
+                return (File) super.getEntity(requestUri, parameters, new FileFeedHandler(this));
             } catch (Exception e) {
                throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
             }
@@ -1029,7 +1203,7 @@ public class FileService extends BaseService {
         }
         String requestUri = this.getModerationUri(fileId, "approval", "file");
         try {
-            return (File) super.getEntity(requestUri, null, new FileFeedHandler());
+            return (File) super.getEntity(requestUri, null, new FileFeedHandler(this));
         } catch (Exception e) {
            throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -1148,8 +1322,55 @@ public class FileService extends BaseService {
             else
                 parameters.putAll(uriBuilder.getParameters());
             //TODO: pass in headers
-            commentEntries = (CommentList) getEntities(uriBuilder.populateURL(accessType,   null, null, null, subFilters, null), parameters, headers, new CommentFeedHandler());
+            commentEntries = (CommentList) getEntities(uriBuilder.populateURL(accessType,   null, null, null, subFilters, null), parameters, headers, new CommentFeedHandler(this));
             return commentEntries;
+        } catch (Exception e) {
+            throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
+        }
+    }
+    
+    /**
+     * Method to get All comments of a Community File
+     * <p>
+     * Rest API Used : 
+     * /files/basic/api/communitylibrary/<communityId>/document/<fileId>/feed
+     * <p>
+     * @param fileId
+     * @param communityId
+     * @return CommentList
+     * @throws FileServiceException
+     */
+    public CommentList getAllCommunityFileComments(String fileId, String communityId) throws FileServiceException {
+    	return getAllCommunityFileComments(fileId, communityId, null);
+    }
+    
+    /**
+     * Method to get All comments of a Community File
+     * <p>
+     * Rest API Used : 
+     * /files/basic/api/communitylibrary/<communityId>/document/<fileId>/feed
+     * <p>
+     * @param fileId
+     * @param communityId
+     * @param parameters
+     * @return CommentList
+     * @throws FileServiceException
+     */
+    public CommentList getAllCommunityFileComments(String fileId, String communityId, Map<String, String> parameters) throws FileServiceException {
+        String accessType =AccessType.AUTHENTICATED.getAccessType();
+        if (StringUtil.isEmpty(fileId)) {
+            throw new FileServiceException(null, Messages.Invalid_FileId);
+        }
+        if (StringUtil.isEmpty(communityId)) {
+            throw new FileServiceException(null, Messages.Invalid_CommunityId);
+        }
+        SubFilters subFilters = new SubFilters();
+        subFilters.setFileId(fileId);
+        subFilters.setCommunityLibraryId(communityId);
+        String resultType = ResultType.FEED.getResultType();
+        String requestUri = FileServiceURIBuilder.constructUrl(FileServiceURIBuilder.FILES.getBaseUrl(), accessType, null, null, null, subFilters, resultType);
+        try {
+        	return (CommentList) getEntities(requestUri, parameters, null, new CommentFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -1211,7 +1432,7 @@ public class FileService extends BaseService {
                 null,
                 subFilters, resultType);
         try {
-            return (File) super.getEntity(requestUri, params, new FileFeedHandler());
+            return (File) super.getEntity(requestUri, params, new FileFeedHandler(this));
         } catch (Exception e) {
            throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -1236,7 +1457,7 @@ public class FileService extends BaseService {
 
         FileList fileEntries = null;
         try {
-            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler());
+            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -1281,7 +1502,7 @@ public class FileService extends BaseService {
 
         FileList fileEntries = null;
         try {
-            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler());
+            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -1319,7 +1540,7 @@ public class FileService extends BaseService {
 
         FileList fileEntries = null;
         try {
-            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler());
+            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -1359,7 +1580,7 @@ public class FileService extends BaseService {
 
         FileList fileEntries = null;
         try {
-            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler());
+            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -1449,7 +1670,7 @@ public class FileService extends BaseService {
 
         FileList fileEntries = null;
         try {
-            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler());
+            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -1497,7 +1718,7 @@ public class FileService extends BaseService {
 
         FileList fileEntries = null;
         try {
-            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler());
+            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -1592,7 +1813,7 @@ public class FileService extends BaseService {
 
         File file;
         try {
-            file = (File) getEntity(requestUri, params, new FileFeedHandler());
+            file = (File) getEntity(requestUri, params, new FileFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -1607,7 +1828,7 @@ public class FileService extends BaseService {
         String requestUri = this.getModerationUri(commentId, "review", "comment");
         Comment Comment;
         try {
-            Comment = (Comment) getEntity(requestUri, null, new CommentFeedHandler());
+            Comment = (Comment) getEntity(requestUri, null, new CommentFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -1627,7 +1848,7 @@ public class FileService extends BaseService {
 
         CommentList commentEntries = null;
         try {
-            commentEntries = (CommentList) getEntities(requestUri, params, new FileFeedHandler());
+            commentEntries = (CommentList) getEntities(requestUri, params, new FileFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -1642,7 +1863,7 @@ public class FileService extends BaseService {
         String requestUri = this.getModerationUri(fileId, "review", "file");
         File fileEntry;
         try {
-            fileEntry = (File) getEntity(requestUri, null, new FileFeedHandler());
+            fileEntry = (File) getEntity(requestUri, null, new FileFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -1684,7 +1905,7 @@ public class FileService extends BaseService {
 
         FileList fileEntries = null;
         try {
-            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler());
+            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -1712,7 +1933,7 @@ public class FileService extends BaseService {
                 subFilters, resultType);
         File fileEntry;
         try {
-            fileEntry = (File) getEntity(requestUri, null, new FileFeedHandler());
+            fileEntry = (File) getEntity(requestUri, null, new FileFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -1746,7 +1967,7 @@ public class FileService extends BaseService {
 
         FileList fileEntries = null;
         try {
-            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler());
+            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e,
                     Messages.MessageExceptionInReadingObject);
@@ -1821,7 +2042,7 @@ public class FileService extends BaseService {
                 resultType);
         FileList fileEntries = null;
         try {
-            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler());
+            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -1881,7 +2102,7 @@ public class FileService extends BaseService {
 
         FileList fileEntries = null;
         try {
-            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler());
+            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -1913,7 +2134,7 @@ public class FileService extends BaseService {
                 resultType);
         FileList fileEntries = null;
         try {
-            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler());
+            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -1949,7 +2170,7 @@ public class FileService extends BaseService {
 
         FileList fileEntries = null;
         try {
-            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler());
+            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -1981,7 +2202,7 @@ public class FileService extends BaseService {
                 resultType);
         FileList fileEntries = null;
         try {
-            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler());
+            fileEntries = (FileList) getEntities(requestUri, params, new FileFeedHandler(this));
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         }
@@ -2175,7 +2396,7 @@ public class FileService extends BaseService {
         Map<String, String> headers = new HashMap<String, String>();
         try {
             Response data = (Response) this.updateData(requestUri, params, headers, null, null);
-            return (File)new FileFeedHandler().createEntity(data);
+            return (File)new FileFeedHandler(this).createEntity(data);
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInRestoreFile);
         }
@@ -2398,7 +2619,7 @@ public class FileService extends BaseService {
 
         try {
             Response result = (Response) this.updateData(requestUri, params, headers, payload, null);
-            return (Comment) new CommentFeedHandler().createEntity(result);
+            return (Comment) new CommentFeedHandler(this).createEntity(result);
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInRestoreFile);
         }
@@ -2433,7 +2654,7 @@ public class FileService extends BaseService {
         try {
             //TODO: check get data wrapping
             Response result = (Response) this.updateData(requestUri, params, content, null);
-            return (File) new FileFeedHandler().createEntity(result);
+            return (File) new FileFeedHandler(this).createEntity(result);
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInRestoreFile);
         }
@@ -2528,7 +2749,7 @@ public class FileService extends BaseService {
         try {
             Response result = (Response) super.updateData(requestUri, params, new ClientService.ContentXml(
                     requestBody, "application/atom+xml"), null);
-            return (File) new FileFeedHandler().createEntity(result);
+            return (File) new FileFeedHandler(this).createEntity(result);
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInRestoreFile);
         }
@@ -2555,12 +2776,10 @@ public class FileService extends BaseService {
             return new File();
         }
         Document updateFilePayload = null;
-        if (payloadMap != null && !payloadMap.isEmpty()) {
-            updateFilePayload = this.constructPayload(fileId, payloadMap);
-        }
+        updateFilePayload = this.constructPayload(fileId, payloadMap);
         return this.updateFileMetadata(fileId, params, updateFilePayload);
     }
-
+    
     // Need to figure out what should be done with the label updation of comment. Connection Doc states that
     // comment updations here can be done on comment content and on label. But what is the label of the
     // comment ? Need to check this.
@@ -2627,7 +2846,7 @@ public class FileService extends BaseService {
         
         try {
             Response result = (Response) this.updateData(requestUri, null, headers, payload, null);
-            return (File) new FileFeedHandler().createEntity(result);
+            return (File) new FileFeedHandler(this).createEntity(result);
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInRestoreFile);
         }
@@ -2704,7 +2923,7 @@ public class FileService extends BaseService {
         try {
             Response data = (Response) super.createData(requestUri, p, headers, contentFile);
            
-            return (File)new FileFeedHandler().createEntity(data);
+            return (File)new FileFeedHandler(this).createEntity(data);
         } catch (Exception e) {
             throw new FileServiceException(e, Messages.MessageExceptionInUpload);
         }
@@ -2935,7 +3154,7 @@ public class FileService extends BaseService {
         FileList resultantEntries;
         try {
             resultantEntries = (FileList) this.getEntities(requestUri, null,
-                    new FileFeedHandler());
+                    new FileFeedHandler(this));
         } catch (Exception e) {
            throw new FileServiceException(e, Messages.MessageExceptionInReadingObject);
         } 

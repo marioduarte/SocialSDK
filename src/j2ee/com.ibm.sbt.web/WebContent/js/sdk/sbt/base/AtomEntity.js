@@ -15,17 +15,22 @@
  */
 
 /**
- * .
+ * AtomEntity class represents an entry from an IBM Connections ATOM feed.
  * 
  * @module sbt.base.AtomEntity
  */
 define([ "../declare", "../lang", "../stringUtil", "./BaseConstants", "./BaseEntity", "./XmlDataHandler" ], 
     function(declare,lang,stringUtil,BaseConstants,BaseEntity,XmlDataHandler) {
 
-    var EntryTmpl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><entry xmlns=\"http://www.w3.org/2005/Atom\" xmlns:app=\"http://www.w3.org/2007/app\" xmlns:snx=\"http://www.ibm.com/xmlns/prod/sn\"><title type=\"text\">${getTitle}</title><content type=\"${contentType}\">${getContent}</content>${categoryScheme}${createEntryData}</entry>";
+    var EntryTmpl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+    				"<entry xmlns=\"http://www.w3.org/2005/Atom\" xmlns:app=\"http://www.w3.org/2007/app\" xmlns:snx=\"http://www.ibm.com/xmlns/prod/sn\">" +
+    					"<title type=\"text\">${getTitle}</title>" +
+    					"<content type=\"${contentType}\">${getContent}</content>" +
+    					"${categoryScheme}${createEntryData}" + 
+    				"</entry>";
 
     /**
-     * AtomEntity class represents an entry from an ATOM feed.
+     * AtomEntity class represents an entry from an IBM Connections ATOM feed.
      * 
      * @class AtomEntity
      * @namespace sbt.base
@@ -33,7 +38,7 @@ define([ "../declare", "../lang", "../stringUtil", "./BaseConstants", "./BaseEnt
     var AtomEntity = declare(BaseEntity, {
     	
     	contentType : "html",
-    	categoryScheme : "",
+    	categoryScheme : null,
 
         /**
          * Construct an AtomEntity.
@@ -47,7 +52,7 @@ define([ "../declare", "../lang", "../stringUtil", "./BaseConstants", "./BaseEnt
                 service : args.service,
                 data : args.data,
                 namespaces : lang.mixin(BaseConstants.Namespaces, args.namespaces || {}),
-                xpath : lang.mixin(BaseConstants.AtomEntryXPath, args.xpath || this.xpath || {})
+                xpath : lang.mixin({}, BaseConstants.AtomEntryXPath, args.xpath || this.xpath || {})
             });
         },
         
@@ -149,7 +154,9 @@ define([ "../declare", "../lang", "../stringUtil", "./BaseConstants", "./BaseEnt
          * @return {Member} author Author of the Forum Reply
          */
         getAuthor : function() {
-            return this.getAsObject([ "authorUserid", "authorName", "authorEmail" ]);
+            return this.getAsObject(
+            		[ "authorUserid", "authorName", "authorEmail", "authorUserState" ],
+            		[ "userid", "name", "email", "userState" ]);
         },
 
         /**
@@ -159,7 +166,9 @@ define([ "../declare", "../lang", "../stringUtil", "./BaseConstants", "./BaseEnt
          * @return {Member} contributor Contributor of the forum
          */
         getContributor : function() {
-            return this.getAsObject([ "contributorUserid", "contributorName", "contributorEmail" ]);
+            return this.getAsObject(
+            		[ "contributorUserid", "contributorName", "contributorEmail", "contributorUserState" ],
+            		[ "userid", "name", "email", "userState" ]);
         },
         
         /**
@@ -221,6 +230,9 @@ define([ "../declare", "../lang", "../stringUtil", "./BaseConstants", "./BaseEnt
          */
         createPostData : function() {
             var transformer = function(value,key) {
+            	if (key == "getContent" && this.contentType == "html") {
+            		value = (value && lang.isString(value)) ? value.replace(/</g,"&lt;").replace(/>/g,"&gt;") : value; 
+            	}
                 return value;
             };
             var postData = stringUtil.transform(EntryTmpl, this, transformer, this);
