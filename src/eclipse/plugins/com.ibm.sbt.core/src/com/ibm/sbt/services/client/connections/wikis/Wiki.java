@@ -43,6 +43,14 @@ public class Wiki extends AtomEntity {
 	}
 	
 	/**
+	 * Label of a wiki.
+	 * @return wikiUuid
+	 */
+	public String getLabel() {
+		return getAsString(WikiXPath.label);
+	}
+	
+	/**
 	 * Community to which the wiki belongs to
 	 * @return communityUuid
 	 */

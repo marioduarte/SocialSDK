@@ -16,19 +16,24 @@
 
 package com.ibm.sbt.services.client.connections.wikis;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import org.w3c.dom.Node;
+
 import com.ibm.sbt.services.client.ClientServicesException;
+import com.ibm.sbt.services.client.base.BaseService;
+import com.ibm.sbt.services.client.base.ConnectionsConstants;
 import com.ibm.sbt.services.client.base.IFeedHandler;
 import com.ibm.sbt.services.client.base.datahandlers.EntityList;
-import com.ibm.sbt.services.client.connections.wikis.base.BaseService;
+import com.ibm.sbt.services.client.connections.wikis.base.AtomFeedHandler;
 import com.ibm.sbt.services.endpoints.Endpoint;
 
 /**
  * @author Mario Duarte
  *
  */
-public class WikiService extends BaseService<Wiki> {
+public class WikiService extends BaseService {
 	
 	public WikiService() {
 		super();
@@ -49,7 +54,7 @@ public class WikiService extends BaseService<Wiki> {
 	 * @throws ClientServicesException
 	 */
 	public EntityList<Wiki> getAllWikis(Map<String, String> parameters) throws ClientServicesException {
-		String requestUrl = new WikiUrl(endpoint).wikis().feed().build();
+		String requestUrl = WikiUrls.ALL_WIKIS.format(endpoint);
 		return getEntityList(requestUrl, parameters);
 	}
 	
@@ -60,7 +65,7 @@ public class WikiService extends BaseService<Wiki> {
 	 * @throws ClientServicesException
 	 */
 	public EntityList<Wiki> getPublicWikis(Map<String, String> parameters) throws ClientServicesException {
-		String requestUrl = new WikiUrl(endpoint).wikis().publicx().build();
+		String requestUrl = WikiUrls.PUBLIC_WIKIS.format(endpoint);
 		return getEntityList(requestUrl, parameters);
 	}
 	
@@ -71,7 +76,7 @@ public class WikiService extends BaseService<Wiki> {
 	 * @throws ClientServicesException
 	 */
 	public EntityList<Wiki> getMyWikis(Map<String, String> parameters) throws ClientServicesException {
-		String requestUrl = new WikiUrl(endpoint).myWikis().feed().build();
+		String requestUrl = WikiUrls.MY_WIKIS.format(endpoint);
 		return getEntityList(requestUrl, parameters);
 	}
 	
@@ -82,7 +87,7 @@ public class WikiService extends BaseService<Wiki> {
 	 * @throws ClientServicesException
 	 */
 	public EntityList<Wiki> getWikisWithMostComments(Map<String, String> parameters) throws ClientServicesException {
-		String requestUrl = new WikiUrl(endpoint).anonymous().wikis().mostCommented().build();
+		String requestUrl = WikiUrls.MOST_COMMENTED_WIKIS.format(endpoint);
 		return getEntityList(requestUrl, parameters);
 	}
 	
@@ -93,7 +98,7 @@ public class WikiService extends BaseService<Wiki> {
 	 * @throws ClientServicesException
 	 */
 	public EntityList<Wiki> getWikisWithMostRecommendations(Map<String, String> parameters) throws ClientServicesException {
-		String requestUrl = new WikiUrl(endpoint).anonymous().wikis().mostRecommended().build();
+		String requestUrl = WikiUrls.MOST_RECOMMENDED_WIKIS.format(endpoint);
 		return getEntityList(requestUrl, parameters);
 	}
 	
@@ -103,18 +108,30 @@ public class WikiService extends BaseService<Wiki> {
 	 * @return
 	 * @throws ClientServicesException
 	 */
-	public EntityList<Wiki> getMostVisitedWikis(Map<String, String> parameters) throws ClientServicesException {
-		String requestUrl = new WikiUrl(endpoint).anonymous().wikis().mostVisited().build();
+	public EntityList<Wiki> getMostVisitedWikis(Map<String, String> parameters) 
+			throws ClientServicesException {
+		String requestUrl = WikiUrls.MOST_VISITED_WIKIS.format(endpoint);
 		return getEntityList(requestUrl, parameters);
 	}
 
 	
+	
 	@SuppressWarnings("unchecked")
-	protected EntityList<Wiki> getEntityList(String requestUrl, Map<String, String> parameters) throws ClientServicesException {
+	private EntityList<Wiki> getEntityList(String requestUrl, Map<String, String> parameters) throws ClientServicesException {
 		return (EntityList<Wiki>)getEntities(requestUrl, getParameters(parameters), getWikiFeedHandler());
 	}
 	
-	protected IFeedHandler getWikiFeedHandler() {
-		return  new WikiFeedHandler(this);
+	private IFeedHandler<Wiki> getWikiFeedHandler() {
+		return new AtomFeedHandler<Wiki>(this) {
+			@Override
+			protected Wiki newEntity(BaseService service, Node node) {
+				return new Wiki(service, node, ConnectionsConstants.nameSpaceCtx, null);
+			}
+		};
+	}
+	
+	private Map<String, String> getParameters(Map<String, String> parameters) {
+		if(parameters == null) return new HashMap<String, String>();
+		else return parameters;
 	}
 }

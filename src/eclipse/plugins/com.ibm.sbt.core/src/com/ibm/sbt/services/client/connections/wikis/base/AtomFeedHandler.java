@@ -27,7 +27,7 @@ import com.ibm.sbt.services.client.base.IFeedHandler;
  * @author Mario Duarte
  *
  */
-public abstract class AtomFeedHandler<T extends AtomEntity> implements IFeedHandler {
+public abstract class AtomFeedHandler<T extends AtomEntity> implements IFeedHandler<T> {
 
 	private BaseService service;
 	
