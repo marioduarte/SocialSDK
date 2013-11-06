@@ -57,7 +57,7 @@
 		<managed-bean-scope>session</managed-bean-scope>
 		<managed-property>
 			<property-name>url</property-name>
-			<value>https://vhost0839.dc1.on.ca.compute.ihost.com:444</value>
+			<value>https://qs.renovations.com:444</value>
 		</managed-property>
 		<managed-property>
 			<property-name>user</property-name>
