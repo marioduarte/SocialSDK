@@ -15,18 +15,17 @@
  */
 package com.ibm.sbt.services.client.smartcloud.profiles;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.ibm.commons.util.StringUtil;
 import com.ibm.commons.util.io.json.JsonObject;
+import com.ibm.sbt.services.client.ClientService;
+import com.ibm.sbt.services.client.ClientServicesException;
+import com.ibm.sbt.services.client.Response;
 import com.ibm.sbt.services.client.base.BaseService;
 import com.ibm.sbt.services.client.smartcloud.profiles.feedhandler.ProfileFeedHandler;
 import com.ibm.sbt.services.client.smartcloud.profiles.util.Messages;
-import com.ibm.sbt.services.client.Response;
-import com.ibm.sbt.services.client.ClientService;
-import com.ibm.sbt.services.client.ClientServicesException;
 import com.ibm.sbt.services.endpoints.Endpoint;
 
 /**
@@ -133,8 +132,6 @@ public class ProfileService extends BaseService {
 			return (Profile) getEntity(serviceUrl, null, profileFeedHandler);
 		} catch (ClientServicesException e) {
 			throw new ProfileServiceException(e, Messages.ProfileError_1);
-		} catch (IOException e) {
-			throw new ProfileServiceException(e, Messages.ProfileError_1);
 		}
 	}
 	
@@ -156,8 +153,6 @@ public class ProfileService extends BaseService {
 		try {
 			return (Profile) getEntity(serviceUrl, null, profileFeedHandler);
 		} catch (ClientServicesException e) {
-			throw new ProfileServiceException(e, Messages.ProfileError_1);
-		} catch (IOException e) {
 			throw new ProfileServiceException(e, Messages.ProfileError_1);
 		}
 	}

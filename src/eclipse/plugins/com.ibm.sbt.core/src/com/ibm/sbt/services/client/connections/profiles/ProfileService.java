@@ -154,8 +154,6 @@ public class ProfileService extends BaseService {
 			profile = (Profile)getEntity(url, parameters, new ProfileFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new ProfileServiceException(e, Messages.ProfileException, id);
-		} catch (IOException e) {
-			throw new ProfileServiceException(e, Messages.ProfileException, id);
 		}
 
 		return profile;
@@ -377,8 +375,6 @@ public class ProfileService extends BaseService {
 		try {
 			colleagueConnection = (ColleagueConnection)getEntity(url, parameters, new ColleagueConnectionFeedHandler(this));
 		} catch (ClientServicesException e) {
-			throw new ProfileServiceException(e, Messages.CheckColleaguesException);
-		} catch (IOException e) {
 			throw new ProfileServiceException(e, Messages.CheckColleaguesException);
 		}
 

@@ -18,7 +18,6 @@ package com.ibm.sbt.services.client.connections.files;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,16 +32,20 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
 import com.ibm.commons.util.StringUtil;
+import com.ibm.sbt.services.client.ClientService;
+import com.ibm.sbt.services.client.ClientService.ContentStream;
+import com.ibm.sbt.services.client.ClientServicesException;
+import com.ibm.sbt.services.client.Response;
 import com.ibm.sbt.services.client.base.BaseService;
 import com.ibm.sbt.services.client.base.transformers.TransformerException;
 import com.ibm.sbt.services.client.connections.communities.CommunityServiceException;
-import com.ibm.sbt.services.client.connections.files.model.FileEntryXPath;
-import com.ibm.sbt.services.client.connections.files.FileServiceException;
+import com.ibm.sbt.services.client.connections.files.feedHandler.CommentFeedHandler;
+import com.ibm.sbt.services.client.connections.files.feedHandler.FileFeedHandler;
 import com.ibm.sbt.services.client.connections.files.model.FileCommentParameterBuilder;
 import com.ibm.sbt.services.client.connections.files.model.FileCommentsFeedParameterBuilder;
+import com.ibm.sbt.services.client.connections.files.model.FileEntryXPath;
 import com.ibm.sbt.services.client.connections.files.model.FileRequestParams;
 import com.ibm.sbt.services.client.connections.files.model.FileRequestPayload;
-import com.ibm.sbt.services.client.connections.files.feedHandler.*;
 import com.ibm.sbt.services.client.connections.files.model.Headers;
 import com.ibm.sbt.services.client.connections.files.transformers.CommentTransformer;
 import com.ibm.sbt.services.client.connections.files.transformers.FileTransformer;
@@ -50,10 +53,6 @@ import com.ibm.sbt.services.client.connections.files.transformers.FolderTransfor
 import com.ibm.sbt.services.client.connections.files.transformers.ModerationTransformer;
 import com.ibm.sbt.services.client.connections.files.transformers.MultipleFileTransformer;
 import com.ibm.sbt.services.client.connections.files.util.Messages;
-import com.ibm.sbt.services.client.ClientService.ContentStream;
-import com.ibm.sbt.services.client.ClientServicesException;
-import com.ibm.sbt.services.client.Response;
-import com.ibm.sbt.services.client.ClientService;
 import com.ibm.sbt.services.endpoints.Endpoint;
 
 /**
@@ -403,8 +402,6 @@ public class FileService extends BaseService {
 		try {
 			return (File) super.getEntity(requestUrl, params, new FileFeedHandler(this)); 
 		} catch (ClientServicesException e) {
-			throw new FileServiceException(e, Messages.MyCommunityFilesException);
-		} catch (IOException e) {
 			throw new FileServiceException(e, Messages.MyCommunityFilesException);
 		}
 	}

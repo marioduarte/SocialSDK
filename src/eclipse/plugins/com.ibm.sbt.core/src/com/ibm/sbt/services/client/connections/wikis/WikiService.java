@@ -17,6 +17,7 @@
 package com.ibm.sbt.services.client.connections.wikis;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Node;
@@ -55,7 +56,7 @@ public class WikiService extends BaseService {
 	 */
 	public EntityList<Wiki> getAllWikis(Map<String, String> parameters) throws ClientServicesException {
 		String requestUrl = WikiUrls.ALL_WIKIS.format(endpoint);
-		return getEntityList(requestUrl, parameters);
+		return getWikiEntityList(requestUrl, parameters);
 	}
 	
 	/**
@@ -66,7 +67,7 @@ public class WikiService extends BaseService {
 	 */
 	public EntityList<Wiki> getPublicWikis(Map<String, String> parameters) throws ClientServicesException {
 		String requestUrl = WikiUrls.PUBLIC_WIKIS.format(endpoint);
-		return getEntityList(requestUrl, parameters);
+		return getWikiEntityList(requestUrl, parameters);
 	}
 	
 	/**
@@ -77,7 +78,7 @@ public class WikiService extends BaseService {
 	 */
 	public EntityList<Wiki> getMyWikis(Map<String, String> parameters) throws ClientServicesException {
 		String requestUrl = WikiUrls.MY_WIKIS.format(endpoint);
-		return getEntityList(requestUrl, parameters);
+		return getWikiEntityList(requestUrl, parameters);
 	}
 	
 	/**
@@ -88,7 +89,7 @@ public class WikiService extends BaseService {
 	 */
 	public EntityList<Wiki> getWikisWithMostComments(Map<String, String> parameters) throws ClientServicesException {
 		String requestUrl = WikiUrls.MOST_COMMENTED_WIKIS.format(endpoint);
-		return getEntityList(requestUrl, parameters);
+		return getWikiEntityList(requestUrl, parameters);
 	}
 	
 	/**
@@ -99,7 +100,7 @@ public class WikiService extends BaseService {
 	 */
 	public EntityList<Wiki> getWikisWithMostRecommendations(Map<String, String> parameters) throws ClientServicesException {
 		String requestUrl = WikiUrls.MOST_RECOMMENDED_WIKIS.format(endpoint);
-		return getEntityList(requestUrl, parameters);
+		return getWikiEntityList(requestUrl, parameters);
 	}
 	
 	/**
@@ -108,17 +109,113 @@ public class WikiService extends BaseService {
 	 * @return
 	 * @throws ClientServicesException
 	 */
-	public EntityList<Wiki> getMostVisitedWikis(Map<String, String> parameters) 
+	public EntityList<Wiki> getMostVisitedWikis(Map<String, String> parameters)  
 			throws ClientServicesException {
 		String requestUrl = WikiUrls.MOST_VISITED_WIKIS.format(endpoint);
-		return getEntityList(requestUrl, parameters);
+		return getWikiEntityList(requestUrl, parameters);
 	}
 
+	/**
+	 * Get a feed that lists all of the pages in a specific wiki. 
+	 * @param wikiLabel
+	 * @param parameters
+	 * @return
+	 * @throws ClientServicesException
+	 */
+	public EntityList<WikiPage> getWikiPages(String wikiLabel, Map<String, String> parameters) 
+			throws ClientServicesException {
+		String requestUrl = WikiUrls.WIKI_PAGES.format(endpoint, wikiLabel);
+		return getWikiPagesEntityList(requestUrl, parameters);
+	}
+	
+	/**
+	 * Get a feed that lists all of the pages in a specific wiki that have been added 
+	 * or edited by the authenticated user.
+	 * @param wikiLabel
+	 * @param parameters
+	 * @return
+	 * @throws ClientServicesException
+	 */
+	public EntityList<WikiPage> getMyWikiPages(String wikiLabel, Map<String, String> parameters) 
+			throws ClientServicesException {
+		String requestUrl = WikiUrls.WIKI_MYPAGES.format(endpoint, wikiLabel);
+		return getWikiPagesEntityList(requestUrl, parameters);
+	}
+	
+	/**
+	 * Get a feed that lists the pages that have been deleted from wikis and are currently 
+	 * stored in the trash.
+	 * @param wikiLabelOrId
+	 * @param parameters
+	 * @return
+	 * @throws ClientServicesException
+	 */
+	public EntityList<WikiPage> getWikiPagesInTrash(String wikiLabelOrId, Map<String, String> parameters) 
+			throws ClientServicesException {
+		String requestUrl = WikiUrls.WIKI_PAGES_TRASH.format(endpoint, wikiLabelOrId);
+		return getWikiPagesEntityList(requestUrl, parameters);
+	}
+	
+	/**
+	 * Retrieves a wiki
+	 * @param wikiLabel
+	 * @param parameters
+	 * @return
+	 * @throws ClientServicesException
+	 */
+	public Wiki getWiki(String wikiLabel, Map<String, String> parameters) throws ClientServicesException {
+		String requestUrl = WikiUrls.WIKI.format(endpoint, wikiLabel);
+		return getWikiEntity(requestUrl, parameters);
+	}
+	
+	/**
+	 * Retrieves a wiki page.
+	 * @param wikiLabel
+	 * @param pageLabel
+	 * @param parameters
+	 * @return
+	 * @throws ClientServicesException
+	 */
+	public WikiPage getWikiPage(String wikiLabel, String pageLabel, Map<String, String> parameters) throws ClientServicesException {
+		String requestUrl = WikiUrls.WIKI_PAGE.format(endpoint, wikiLabel, pageLabel);
+		return getWikiPageEntity(requestUrl, parameters);
+	}
+	
+	
+	public void createWiki(Wiki wiki) throws ClientServicesException {
+		String requestUrl =  WikiUrls.ALL_WIKIS.format(endpoint);
+		String contentType = "application/atom+xml";
+		// POST
+	}
+	
+	public void updateWiki(Wiki wiki, Map<String, String> parameters) {
+		String requestUrl =  WikiUrls.WIKI_AUTH.format(endpoint, wiki.getLabel());
+		String contentType = "application/atom+xml";
+		// PUT
+	}
+	
+	public void deleteWiki(String wikiLabel) {
+		String requestUrl =  WikiUrls.WIKI_AUTH.format(endpoint, wikiLabel);
+		// DELETE
+	}
 	
 	
 	@SuppressWarnings("unchecked")
-	private EntityList<Wiki> getEntityList(String requestUrl, Map<String, String> parameters) throws ClientServicesException {
+	private EntityList<Wiki> getWikiEntityList(String requestUrl, Map<String, String> parameters) throws ClientServicesException {
 		return (EntityList<Wiki>)getEntities(requestUrl, getParameters(parameters), getWikiFeedHandler());
+	}
+	
+	private Wiki getWikiEntity(String requestUrl, Map<String, String> parameters) throws ClientServicesException {
+		return (Wiki)getEntity(requestUrl, parameters, getWikiFeedHandler());
+	}
+	
+	@SuppressWarnings("unchecked")
+	private EntityList<WikiPage> getWikiPagesEntityList(String requestUrl, Map<String, String> parameters) throws ClientServicesException {
+		return (EntityList<WikiPage>)getEntities(requestUrl, getParameters(parameters), getWikiPagesFeedHandler());
+	}
+	
+	private WikiPage getWikiPageEntity(String requestUrl, Map<String, String> parameters) throws ClientServicesException {
+		return (WikiPage)getEntity(requestUrl, parameters, getWikiPagesFeedHandler());
 	}
 	
 	private IFeedHandler<Wiki> getWikiFeedHandler() {
@@ -126,6 +223,15 @@ public class WikiService extends BaseService {
 			@Override
 			protected Wiki newEntity(BaseService service, Node node) {
 				return new Wiki(service, node, ConnectionsConstants.nameSpaceCtx, null);
+			}
+		};
+	}
+	
+	private IFeedHandler<WikiPage> getWikiPagesFeedHandler() {
+		return new AtomFeedHandler<WikiPage>(this) {
+			@Override
+			protected WikiPage newEntity(BaseService service, Node node) {
+				return new WikiPage(service, node, ConnectionsConstants.nameSpaceCtx, null);
 			}
 		};
 	}

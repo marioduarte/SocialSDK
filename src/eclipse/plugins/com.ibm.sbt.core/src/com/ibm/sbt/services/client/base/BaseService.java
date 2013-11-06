@@ -172,7 +172,7 @@ public abstract class BaseService {
 	/*
 	 * This method makes a network call and returns an entity
 	 */
-	protected BaseEntity getEntity(String url, Map<String, String> parameters, IFeedHandler feedHandler) throws IOException, ClientServicesException {
+	protected BaseEntity getEntity(String url, Map<String, String> parameters, IFeedHandler feedHandler) throws ClientServicesException {
 		Response dataHolder = null;
 		dataHolder = retrieveData(url, parameters);
 		return feedHandler.createEntity(dataHolder);
@@ -189,7 +189,7 @@ public abstract class BaseService {
 	/*
      * This method makes a network call and returns a Collection of Entities
      */
-    protected EntityList<? extends BaseEntity> getEntities(String url, Map<String, String> parameters, Map<String, String> headers, IFeedHandler feedHandler) throws ClientServicesException, IOException {
+    protected EntityList<? extends BaseEntity> getEntities(String url, Map<String, String> parameters, Map<String, String> headers, IFeedHandler feedHandler) throws ClientServicesException {
         Response dataHolder = retrieveData(url, parameters, headers, null);
         return feedHandler.createEntityList(dataHolder);
     }

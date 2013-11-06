@@ -15,7 +15,6 @@
  */
 package com.ibm.sbt.services.client.connections.forums;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,11 +25,13 @@ import com.ibm.sbt.services.client.Response;
 import com.ibm.sbt.services.client.base.BaseService;
 import com.ibm.sbt.services.client.base.ConnectionsConstants;
 import com.ibm.sbt.services.client.base.util.EntityUtil;
+import com.ibm.sbt.services.client.connections.communities.Community;
+import com.ibm.sbt.services.client.connections.communities.CommunityServiceException;
 import com.ibm.sbt.services.client.connections.forums.feedhandler.ForumsFeedHandler;
+import com.ibm.sbt.services.client.connections.forums.feedhandler.RecommendationsFeedHandler;
 import com.ibm.sbt.services.client.connections.forums.feedhandler.RepliesFeedHandler;
 import com.ibm.sbt.services.client.connections.forums.feedhandler.TagFeedHandler;
 import com.ibm.sbt.services.client.connections.forums.feedhandler.TopicsFeedHandler;
-import com.ibm.sbt.services.client.connections.forums.feedhandler.RecommendationsFeedHandler; 
 import com.ibm.sbt.services.client.connections.forums.transformers.BaseForumTransformer;
 import com.ibm.sbt.services.endpoints.Endpoint;
 import com.ibm.sbt.services.util.AuthUtil;
@@ -608,8 +609,6 @@ public class ForumService extends BaseService {
 			topic = (ForumTopic)getEntity(myTopicsUrl, parameters, new TopicsFeedHandler(this));
 		} catch (ClientServicesException e) {
 			throw new ForumServiceException(e);
-		} catch (IOException e) {
-			throw new ForumServiceException(e);
 		}
 
 		return topic;
@@ -834,8 +833,6 @@ public class ForumService extends BaseService {
 		try {
 			reply = (ForumReply)getEntity(myRepliesUrl, parameters, new RepliesFeedHandler(this));
 		} catch (ClientServicesException e) {
-			throw new ForumServiceException(e);
-		} catch (IOException e) {
 			throw new ForumServiceException(e);
 		}
 

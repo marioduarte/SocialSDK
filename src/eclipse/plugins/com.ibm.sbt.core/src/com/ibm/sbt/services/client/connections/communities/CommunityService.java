@@ -882,8 +882,6 @@ public class CommunityService extends BaseService {
 			file = (File) super.getEntity(requestUrl, params, new FileFeedHandler(new FileService())); 
 		} catch (ClientServicesException e) {
 			throw new CommunityServiceException(e, Messages.DownloadCommunitiesException);
-		} catch (IOException e) {
-			throw new CommunityServiceException(e, Messages.DownloadCommunitiesException);
 		}
 		// now we have the file.. we need to download it.. 
 		SubFilters downloadFilters = new SubFilters();

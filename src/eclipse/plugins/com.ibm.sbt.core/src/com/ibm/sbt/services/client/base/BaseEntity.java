@@ -244,7 +244,7 @@ public class BaseEntity {
 			return (String[])fields.get(field.getName());
 		}
 		if (dataHandler != null) {
-			return dataHandler.getAsArray(field.getName());
+			return dataHandler.getAsArray(field);
 		}
 		throw new NullPointerException(StringUtil.format("Field {0} was not found or had no value",field.getName()));
 	}

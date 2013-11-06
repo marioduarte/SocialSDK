@@ -16,9 +16,12 @@
 
 package com.ibm.sbt.services.client.connections.wikis;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import com.ibm.commons.runtime.util.URLEncoding;
 import com.ibm.commons.util.StringUtil;
 import com.ibm.sbt.services.endpoints.Endpoint;
 import com.ibm.sbt.services.util.AuthUtil;
@@ -34,7 +37,12 @@ public enum WikiUrls {
 	MOST_COMMENTED_WIKIS("wikis/{0}/anonymous/api/wikis/mostcommented"),
 	MOST_RECOMMENDED_WIKIS("wikis/{0}/anonymous/api/wikis/mostrecommended"),
 	MOST_VISITED_WIKIS("wikis/{0}/anonymous/api/wikis/mostvisited"),
-	WIKI_PAGES("wikis/{0}/anonymous/api/wiki/{1}/feed");
+	WIKI_PAGES("wikis/{0}/anonymous/api/wiki/{1}/feed"),
+	WIKI_MYPAGES("wikis/{0}/api/wiki/{1}/mypages"),
+	WIKI_PAGES_TRASH("wikis/{0}/anonymous/api/wiki/{1}/recyclebin/feed"),
+	WIKI("wikis/{0}/anonymous/api/wiki/{1}/entry"),
+	WIKI_AUTH("wikis/{0}/api/wiki/{1}/entry"),
+	WIKI_PAGE("wikis/{0}/anonymous/api/wiki/{1}/page/{2}/entry");
 	
 	private String urlPattern;
 	
@@ -43,22 +51,25 @@ public enum WikiUrls {
 	}
 	
 	public String format(String... args) {
-		return formatPattern((Object[])args);
+		return formatPattern(Arrays.asList(args));
 	}
 	
 	public String format(Endpoint endpoint, String... args) {
-		return formatPattern(getAuth(endpoint), args);
+		List<String> list = new ArrayList<String>(Arrays.asList(args));
+		list.add(0, getAuth(endpoint));
+		return formatPattern(list);
 	}
 	
-	private String formatPattern(Object... args) {
-		for(int i=0; i<args.length; i++) {
+	private String formatPattern(List<String> args) {
+		List<String> encoded = new ArrayList<String>();
+		for(String arg : args) {
 			try {
-				args[i] = URLEncoder.encode(args[i].toString(), "UTF-8");
-			} catch (UnsupportedEncodingException e) {
+				encoded.add(URLEncoding.encodeURIString(arg, "UTF-8", 0, false));
+			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		}
-		return StringUtil.format(urlPattern, (Object[])args);
+		return StringUtil.format(urlPattern, encoded.toArray());
 	}
 	
 	private String getAuth(Endpoint endpoint) {

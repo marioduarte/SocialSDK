@@ -16,32 +16,32 @@
 
 package com.ibm.sbt.services.client.connections.wikis;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.w3c.dom.Node;
 
 import com.ibm.commons.xml.NamespaceContext;
 import com.ibm.commons.xml.xpath.XPathExpression;
 import com.ibm.sbt.services.client.base.AtomEntity;
-import com.ibm.sbt.services.client.base.AtomXPath;
-import com.ibm.sbt.services.client.base.BaseEntity;
 import com.ibm.sbt.services.client.base.BaseService;
 
 /**
  * @author Mario Duarte
  *
  */
-public class Wiki extends AtomEntity {
+public class WikiPage extends AtomEntity {
 
-	public Wiki(BaseService service, Node node, NamespaceContext namespaceCtx, 
-			XPathExpression xpathExpression) {
+	/**
+	 * @param service
+	 * @param node
+	 * @param namespaceCtx
+	 * @param xpathExpression
+	 */
+	public WikiPage(BaseService service, Node node,
+			NamespaceContext namespaceCtx, XPathExpression xpathExpression) {
 		super(service, node, namespaceCtx, xpathExpression);
 	}
 	
 	/**
-	 * Unique identifier of a wiki.
+	 * Unique identifier of the wiki page.
 	 * @return wikiUuid
 	 */
 	public String getUuid() {
@@ -49,42 +49,25 @@ public class Wiki extends AtomEntity {
 	}
 	
 	/**
-	 * Label of a wiki.
+	 * Label of the wiki page.
 	 * @return wikiUuid
 	 */
 	public String getLabel() {
 		return getAsString(WikiXPath.label);
 	}
-	
 	/**
-	 * Community to which the wiki belongs to
-	 * @return communityUuid
+	 * Unique version identifier.
+	 * @return
 	 */
-	public String getCommunityUuid() {
-		return getAsString(WikiXPath.communityUuid);
+	public String getVersionUuid() {
+		return getAsString(WikiXPath.versionUuid);
 	}
-	
+
 	/**
-	 * 
-	 * @return The list of tags of the wiki.
+	 * Incremental version number, starting at 1.
+	 * @return
 	 */
-	public Set<String> getTags() {
-		return new HashSet<String>(Arrays.asList(getAsArray(AtomXPath.categoryTerm)));
-	}
-	
-	/**
-	 * 
-	 * @return boolean indication whether or not this wiki is a community wiki.
-	 */
-	public boolean isCommunityWiki() {
-		return getCommunityUuid() != null;
-	}
-	
-	public void setLabel(String label) {
-		setAsString(WikiXPath.label, label);
-	}
-	
-	public void setTags(String[] tags) {
-		super.setCategoryTerms(tags);
+	public String getVersionLabel() {
+		return getAsString(WikiXPath.versionLabel);
 	}
 }
