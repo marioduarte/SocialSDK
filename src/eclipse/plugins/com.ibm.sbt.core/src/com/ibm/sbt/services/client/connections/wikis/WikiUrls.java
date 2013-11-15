@@ -50,7 +50,7 @@ public enum WikiUrls {
 		this.urlPattern = urlPattern;
 	}
 	
-	public String format(String... args) {
+	protected String format(String... args) {
 		return formatPattern(Arrays.asList(args));
 	}
 	

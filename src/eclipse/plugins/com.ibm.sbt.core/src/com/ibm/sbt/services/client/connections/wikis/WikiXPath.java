@@ -26,11 +26,13 @@ import com.ibm.sbt.services.client.base.datahandlers.FieldEntry;
  *
  */
 public enum WikiXPath implements FieldEntry {
-	entry("/a:entry"),
 	uuid("./td:uuid"),
 	label("./td:label"),
 	communityUuid("./snx:communityUuid"),
+	permissions("./td:permissions"),
+	sharedWith("./sharedWith"),
 	
+	// WikiPageXpaths
 	versionUuid("./td:versionUuid"),
 	versionLabel("./td:versionLabel"),
 	;

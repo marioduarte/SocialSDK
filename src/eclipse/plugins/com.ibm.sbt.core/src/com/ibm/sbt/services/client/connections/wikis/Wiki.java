@@ -94,4 +94,7 @@ public class Wiki extends AtomEntity {
 	public boolean isCommunityWiki() {
 		return getCommunityUuid() != null;
 	}
+	
+	
+
 }
