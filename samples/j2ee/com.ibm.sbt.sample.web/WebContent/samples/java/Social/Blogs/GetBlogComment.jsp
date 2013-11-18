@@ -23,7 +23,7 @@
 <%@page import="com.ibm.sbt.services.client.connections.blogs.Blog"%>
 <%@page import="com.ibm.sbt.services.client.connections.blogs.CommentList"%>
 <%@page import="com.ibm.sbt.services.client.connections.blogs.Comment"%>
-<%@page import="com.ibm.sbt.services.client.connections.blogs.model.Author"%>
+<%@page import="com.ibm.sbt.services.client.connections.common.Person"%>
 <%@page import="java.io.PrintWriter"%>
 <%@page import="com.ibm.sbt.services.client.connections.activitystreams.model.Reply"%>
 <%@page import="java.util.List"%>
@@ -45,7 +45,7 @@
 			BlogList blogs = service.getBlogs();
 			Blog blog = (Blog)blogs.get(0);
 			
-			CommentList comments = service.getBlogsComments();
+			CommentList comments = service.getAllComments();
 			if(comments.size()>0){
 				String commentId = comments.get(0).getUid();
 				Comment comment = service.getBlogComment(blog.getHandle(),commentId);

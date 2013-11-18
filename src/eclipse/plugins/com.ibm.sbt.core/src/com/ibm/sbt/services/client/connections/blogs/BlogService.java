@@ -19,7 +19,6 @@ package com.ibm.sbt.services.client.connections.blogs;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
 import com.ibm.commons.util.StringUtil;
 import com.ibm.sbt.services.client.ClientService;
 import com.ibm.sbt.services.client.ClientServicesException;
@@ -192,19 +191,19 @@ public class BlogService extends BaseService {
 	 * @return BlogPostList
 	 * @throws BlogServiceException
 	 */
-	public BlogPostList getBlogsPosts() throws BlogServiceException{
-		return getBlogsPosts(null);
+	public BlogPostList getAllPosts() throws BlogServiceException{
+		return getAllPosts(null);
 		
 	}
 	
 	/**
-	 * This method returns the most recent Blog posts
+	 * This method returns the most recent posts
 	 * 
 	 * @param parameters
 	 * @return BlogPostList
 	 * @throws BlogServiceException
 	 */
-	public BlogPostList getBlogsPosts(Map<String, String> parameters) throws BlogServiceException {
+	public BlogPostList getAllPosts(Map<String, String> parameters) throws BlogServiceException {
 		BlogPostList blogPosts;
 		
 		if(null == parameters){
@@ -222,24 +221,24 @@ public class BlogService extends BaseService {
 	}
 	
 	/**
-	 * This method returns the featured Blog posts
+	 * This method returns the featured posts
 	 * 
 	 * @return BlogPostList
 	 * @throws BlogServiceException
 	 */
-	public BlogPostList GetFeaturedBlogsPosts() throws BlogServiceException{
-		return GetFeaturedBlogsPosts(null);
+	public BlogPostList getFeaturedPosts() throws BlogServiceException{
+		return getFeaturedPosts(null);
 		
 	}
 	
 	/**
-	 * This method returns the featured Blog posts
+	 * This method returns the featured posts
 	 * 
 	 * @param parameters
 	 * @return BlogPostList
 	 * @throws BlogServiceException
 	 */
-	public BlogPostList GetFeaturedBlogsPosts(Map<String, String> parameters) throws BlogServiceException {
+	public BlogPostList getFeaturedPosts(Map<String, String> parameters) throws BlogServiceException {
 		BlogPostList blogPosts;
 		
 		if(null == parameters){
@@ -257,24 +256,24 @@ public class BlogService extends BaseService {
 	}
 	
 	/**
-	 * This method returns the recommended Blogs posts
+	 * This method returns the recommended posts
 	 * 
 	 * @return BlogPostList
 	 * @throws BlogServiceException
 	 */
-	public BlogPostList GetRecommendedBlogsPosts() throws BlogServiceException{
-		return GetRecommendedBlogsPosts(null);
+	public BlogPostList getRecommendedPosts() throws BlogServiceException{
+		return getRecommendedPosts(null);
 		
 	}
 	
 	/**
-	 * This method returns the recommended Blogs posts
+	 * This method returns the recommended posts
 	 * 
 	 * @param parameters
 	 * @return BlogPostList
 	 * @throws BlogServiceException
 	 */
-	public BlogPostList GetRecommendedBlogsPosts(Map<String, String> parameters) throws BlogServiceException {
+	public BlogPostList getRecommendedPosts(Map<String, String> parameters) throws BlogServiceException {
 		BlogPostList blogPosts;
 		
 		if(null == parameters){
@@ -297,8 +296,8 @@ public class BlogService extends BaseService {
 	 * @return CommentList
 	 * @throws BlogServiceException
 	 */
-	public CommentList getBlogsComments() throws BlogServiceException{
-		return getBlogsComments(null);
+	public CommentList getAllComments() throws BlogServiceException{
+		return getAllComments(null);
 		
 	}
 	
@@ -309,7 +308,7 @@ public class BlogService extends BaseService {
 	 * @return CommentList
 	 * @throws BlogServiceException
 	 */
-	public CommentList getBlogsComments(Map<String, String> parameters) throws BlogServiceException {
+	public CommentList getAllComments(Map<String, String> parameters) throws BlogServiceException {
 		CommentList comments;
 		
 		if(null == parameters){
@@ -332,7 +331,7 @@ public class BlogService extends BaseService {
 	 * @return TagList
 	 * @throws BlogServiceException
 	 */
-	public TagList getBlogsTags() throws BlogServiceException {
+	public TagList getAllTags() throws BlogServiceException {
 		TagList tags;
 		try {
 			String allTagsUrl = resolveUrl(BLOG_HANDLE, FilterType.BLOGS_TAGS, null);
@@ -469,7 +468,27 @@ public class BlogService extends BaseService {
 
         return blog;
 	}
+	/**
+	 * Wrapper method to get a Blog 
+	 * 
+	 * @param Blog
+	 * @throws BlogServiceException
+	 */
+	public Blog getBlog(String blogUuid) throws BlogServiceException {
 	
+		if(StringUtil.isEmpty(blogUuid)){
+			throw new BlogServiceException(null, "null blogUuid");
+		}
+		String getBlogUrl = resolveUrl(BLOG_HANDLE, FilterType.GET_UPDATE_REMOVE_BLOG, blogUuid);
+		Blog blog;
+		try {
+			blog = (Blog)getEntity(getBlogUrl, null, new BlogsFeedHandler(this));
+		} catch (Exception e) {
+			throw new BlogServiceException(e, "error getting blog");
+		} 
+		return blog;
+		
+	}
 	/**
 	 * Wrapper method to update a Blog 
 	 * 
@@ -494,7 +513,7 @@ public class BlogService extends BaseService {
 			Map<String, String> headers = new HashMap<String, String>();
 			headers.put("Content-Type", "application/atom+xml");
 			
-			String updateBlogUrl = resolveUrl(BLOG_HANDLE, FilterType.UPDATE_REMOVE_BLOG, blog.getUid());
+			String updateBlogUrl = resolveUrl(BLOG_HANDLE, FilterType.GET_UPDATE_REMOVE_BLOG, blog.getUid());
 			// not using super.updateData, as unique id needs to be provided, along with passing params, since no params
 			//is passed, it'll throw NPE in BaseService updateData - check with Manish
 			getClientService().put(updateBlogUrl, null,headers, payload,ClientService.FORMAT_NULL);
@@ -519,7 +538,7 @@ public class BlogService extends BaseService {
 			throw new BlogServiceException(null, "null blog Uuid");
 		}
 		try {
-			String deleteBlogUrl = resolveUrl(BLOG_HANDLE, FilterType.UPDATE_REMOVE_BLOG, blogUuid);
+			String deleteBlogUrl = resolveUrl(BLOG_HANDLE, FilterType.GET_UPDATE_REMOVE_BLOG, blogUuid);
 			getClientService().delete(deleteBlogUrl);
 		} catch (Exception e) {
 			throw new BlogServiceException(e,"error deleting blog");
@@ -620,6 +639,9 @@ public class BlogService extends BaseService {
 		if (null == post){
 			throw new BlogServiceException(null,"null post");
 		}
+		if (StringUtil.isEmpty(blogHandle)){
+			throw new BlogServiceException(null,"blog handle is not passed");
+		}
 		Response result = null;
 		try {
 			BaseBlogTransformer transformer = new BaseBlogTransformer(post);
@@ -634,6 +656,7 @@ public class BlogService extends BaseService {
 		} catch (Exception e) {
 			throw new BlogServiceException(e, "error creating blog post");
 		}
+		
         return post;
 	}
 	
@@ -644,7 +667,7 @@ public class BlogService extends BaseService {
 	 * @param blogHandle
 	 * @throws BlogServiceException
 	 */
-	public void updateBlogPost(BlogPost post, String blogHandle) throws BlogServiceException {
+	public BlogPost updateBlogPost(BlogPost post, String blogHandle) throws BlogServiceException {
 		if (null == post){
 			throw new BlogServiceException(null,"null post");
 		}
@@ -663,12 +686,15 @@ public class BlogService extends BaseService {
 			headers.put("Content-Type", "application/atom+xml");
 			
 			String updatePostUrl = resolveUrl(blogHandle, FilterType.UPDATE_REMOVE_POST, post.getUid());
-			getClientService().put(updatePostUrl, null,headers, payload,ClientService.FORMAT_NULL);
+			Response result = getClientService().put(updatePostUrl, null,headers, payload,ClientService.FORMAT_NULL);
+			post = (BlogPost) new BlogPostsFeedHandler(this).createEntity(result);
+
 
 		} catch (Exception e) {
 			throw new BlogServiceException(e, "error updating blog post");
 		}
 
+		return post;
 	}
 	
 	/**
