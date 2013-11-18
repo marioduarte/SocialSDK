@@ -32,11 +32,13 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
+import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
 
 import com.ibm.commons.util.StringUtil;
@@ -70,14 +72,29 @@ public class XmlSerializer {
 		return docBuilder.newDocument();
 	}
 	
-	public String serealizeToString() {
+	public String serializeToString() {
+		DOMImplementation impl = doc.getImplementation();
+		DOMImplementationLS implLS = (DOMImplementationLS) impl.getFeature("LS", "3.0");
+		LSSerializer lsSerializer = implLS.createLSSerializer();
+		lsSerializer.getDomConfig().setParameter("format-pretty-print", true);
+		 
+		LSOutput lsOutput = implLS.createLSOutput();
+		lsOutput.setEncoding("UTF-8");
+		Writer stringWriter = new StringWriter();
+		lsOutput.setCharacterStream(stringWriter);
+		lsSerializer.write(doc, lsOutput);
+		
+		return stringWriter.toString();
+	}
+	
+	public String serializeToString3() {
 		DOMImplementationLS domImplementation = (DOMImplementationLS) doc.getImplementation();
 	    LSSerializer lsSerializer = domImplementation.createLSSerializer();
 	    lsSerializer.getDomConfig().setParameter("format-pretty-print", true);
 	    return lsSerializer.writeToString(doc);   
 	}
 	
-	public String serealizeToString2() {
+	public String serializeToString2() {
 		StringWriter writer = new StringWriter();
 		serialize2(writer);
 		return writer.toString();

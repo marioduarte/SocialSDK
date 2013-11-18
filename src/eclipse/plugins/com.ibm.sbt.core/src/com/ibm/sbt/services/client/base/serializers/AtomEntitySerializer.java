@@ -34,7 +34,7 @@ public abstract class AtomEntitySerializer<T extends AtomEntity> extends BaseEnt
 		super(entity);
 	}
 	
-	protected Node genericAtomEntry() {
+	public Node genericAtomEntry() {
 		Node entry = entry();
 		
 		appendChilds(entry, 
