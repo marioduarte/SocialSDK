@@ -35,6 +35,12 @@ public enum WikiXPath implements FieldEntry {
 	// WikiPageXpaths
 	versionUuid("./td:versionUuid"),
 	versionLabel("./td:versionLabel"),
+	recommendationsCount("./snx:rank[@scheme='http://www.ibm.com/xmlns/prod/sn/recommendations']"),
+	commentsCount("./snx:rank[@scheme='http://www.ibm.com/xmlns/prod/sn/comment']"),
+	viewCount("./snx:rank[@scheme='http://www.ibm.com/xmlns/prod/sn/hit']"),
+	anonymousViewsCount("./snx:rank[@scheme='http://www.ibm.com/xmlns/prod/sn/anonymous_hit']"),
+	attachmentsCount("./snx:rank[@scheme='http://www.ibm.com/xmlns/prod/sn/attachments']"),
+	versionsCount("./snx:rank[@scheme='http://www.ibm.com/xmlns/prod/sn/versions']"),
 	;
 	
 	private final XPathExpression path;

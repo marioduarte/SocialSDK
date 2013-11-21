@@ -33,20 +33,31 @@ public class WikiSerializer extends AtomEntitySerializer<Wiki> {
 		super(wiki);
 	}
 	
-	public WikiSerializer create() {
+	public void generateCreate() {
 		Node entry = entry();
 		
 		appendChilds(entry,
-			title(),
-			label(),
-			wikiCategory(),
-			sharedWith(),
-			permissions(),
-			summary()
+				title(),
+				label(),
+				wikiCategory(),
+				sharedWith(),
+				permissions(),
+				summary()
 		);
 		
 		appendChilds(entry, tags());
-		return this;
+	}
+	
+	public void generateUpdate() {
+		Node entry = genericAtomEntry();
+		
+		appendChilds(entry,
+				label(),
+				wikiCategory(),
+				communityId(),
+				sharedWith(),
+				permissions()
+		);
 	}
 	
 	private Element wikiCategory() {
@@ -58,6 +69,10 @@ public class WikiSerializer extends AtomEntitySerializer<Wiki> {
 	
 	private Element label() {
 		return textElement(Namespace.TD, "label", entity.getLabel());
+	}
+	
+	private Element communityId() {
+		return textElement(Namespace.SNX, "communityUuid", entity.getCommunityUuid());
 	}
 	
 	private Element sharedWith() {

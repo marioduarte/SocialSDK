@@ -24,6 +24,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import com.ibm.commons.xml.xpath.XPathExpression;
+import com.ibm.sbt.services.client.ClientService;
 import com.ibm.sbt.services.client.ClientServicesException;
 import com.ibm.sbt.services.client.Response;
 import com.ibm.sbt.services.client.base.AtomFeedHandler;
@@ -32,6 +33,7 @@ import com.ibm.sbt.services.client.base.BaseService;
 import com.ibm.sbt.services.client.base.ConnectionsConstants;
 import com.ibm.sbt.services.client.base.IFeedHandler;
 import com.ibm.sbt.services.client.base.datahandlers.EntityList;
+import com.ibm.sbt.services.client.connections.wikis.serializers.WikiPageSerializer;
 import com.ibm.sbt.services.client.connections.wikis.serializers.WikiSerializer;
 import com.ibm.sbt.services.endpoints.Endpoint;
 
@@ -171,7 +173,6 @@ public class WikiService extends BaseService {
 	}
 	
 	
-	
 	/***************************************************************
 	 * Working with wikis 
 	 ****************************************************************/
@@ -185,16 +186,45 @@ public class WikiService extends BaseService {
 	 */
 	public Wiki getWiki(String wikiLabel, Map<String, String> parameters) 
 			throws ClientServicesException {
-		// FIXME authenticated vs not authenticated request?! (WikiUrls.WIKI vs WikiUrls.WIKI_AUTH)
 		String requestUrl = WikiUrls.WIKI.format(endpoint, wikiLabel); 
 		return getWikiEntity(requestUrl, parameters);
 	}
 	
-	
-	public Wiki createWiki(Wiki wiki) throws ClientServicesException {
+	/**
+	 * Create a wiki programmatically
+	 * @param wiki
+	 * @param parameters
+	 * @return
+	 * @throws ClientServicesException
+	 */
+	public Wiki createWiki(Wiki wiki, Map<String, String> parameters) 
+			throws ClientServicesException {
 		String requestUrl = WikiUrls.ALL_WIKIS.format(endpoint);
-		Response response = createWiki(requestUrl, wiki);
+		Response response = createWiki(requestUrl, wiki, parameters);
 		return getWikiFeedHandler().createEntity(response);
+	}
+	
+	/**
+	 * Update an existing wiki
+	 * @param wikiLabel
+	 * @param wiki
+	 * @param parameters
+	 * @throws ClientServicesException
+	 */
+	public void updateWiki(String wikiLabel, Wiki wiki, Map<String, String> parameters) 
+			throws ClientServicesException {
+		String requestUrl = WikiUrls.WIKI_AUTH.format(endpoint, wiki.getLabel());
+		updateWikiAux(requestUrl, wiki, parameters);
+	}
+	
+	/**
+	 * Delete a wiki
+	 * @param wikiLabel
+	 * @throws ClientServicesException
+	 */
+	public void deleteWiki(String wikiLabel) throws ClientServicesException {
+		String requestUrl = WikiUrls.WIKI_AUTH.format(endpoint, wikiLabel);
+		deleteData(requestUrl);
 	}
 	
 	
@@ -215,20 +245,59 @@ public class WikiService extends BaseService {
 		return getWikiPageEntity(requestUrl, parameters);
 	}
 	
+	/**
+	 * Create a wiki page programmatically.
+	 * @param wikiPage
+	 * @param parameters
+	 * @return
+	 * @throws ClientServicesException
+	 */
+	public WikiPage createWikiPage(WikiPage wikiPage, Map<String, String> parameters) 
+			throws ClientServicesException {
+		String requestUrl = WikiUrls.WIKI_PAGES_AUTH.format(endpoint, wikiPage.getLabel());
+		Response response = createWikiPage(requestUrl, wikiPage, parameters);
+		return getWikiPageFeedHandler().createEntity(response);
+	}
 	
+	/**
+	 * Update an existing wiki page.
+	 * @param wikiLabel
+	 * @param wikPage
+	 * @param parameters
+	 * @throws ClientServicesException
+	 */
+	public void updateWikiPage(String wikiLabel, WikiPage wikiPage, 
+			Map<String, String> parameters) throws ClientServicesException {
+		String requestUrl = WikiUrls.WIKI_PAGE_AUTH.format(endpoint, wikiLabel, wikiPage.getLabel());
+		updateWikiPageAux(requestUrl, wikiPage, parameters);
+	}
 	
+	/**
+	 * Delete a wiki page.
+	 * @param wikiLabel
+	 * @param wikiPageLable
+	 * @throws ClientServicesException
+	 */
+	public void deleteWikiPage(String wikiLabel, String wikiPageLable) 
+			 throws ClientServicesException {
+		String requestUrl = WikiUrls.WIKI_PAGE_AUTH.format(endpoint, wikiLabel, wikiPageLable);
+		deleteData(requestUrl);
+	}
 	
+
+
 	/***************************************************************
 	 * Utility methods
 	 ****************************************************************/
 	
-	private Response createWiki(String requestUrl, Wiki wiki) throws ClientServicesException {
+	private Response createWiki(String requestUrl, Wiki wiki,  
+			Map<String, String> parameters) throws ClientServicesException {
 		try {
 			Map<String,String> headers = new HashMap<String, String>();
 			headers.put("Content-Type", "application/atom+xml");
 			WikiSerializer serializer = new WikiSerializer(wiki);
-			serializer.create();
-			return createData(requestUrl, null, headers, serializer.serializeToString());
+			serializer.generateCreate();
+			return createData(requestUrl, parameters, headers, serializer.serializeToString());
 		}
 		catch(ClientServicesException e) {
 			throw e;
@@ -238,13 +307,60 @@ public class WikiService extends BaseService {
 		}
 	}
 	
-//	private Wiki extractWikiLocation(Response response){
-//		Header locationHeader = response.getResponse().getFirstHeader("Location");
-//		if(locationHeader != null) {
-//			String location = locationHeader.getValue();
-//			// FIXME
-//		}
-//	}
+	private Response updateWikiAux(String requestUrl, Wiki wiki,  
+			Map<String, String> parameters) throws ClientServicesException {
+		try {
+			Map<String,String> headers = new HashMap<String, String>();
+			headers.put("Content-Type", "application/atom+xml");
+			WikiSerializer serializer = new WikiSerializer(wiki);
+			serializer.generateUpdate();
+			return updateData(requestUrl, parameters, headers, serializer.serializeToString());
+		}
+		catch(ClientServicesException e) {
+			throw e;
+		}
+		catch(Exception e) {
+			throw new ClientServicesException(e);
+		}
+	}
+	
+	private Response createWikiPage(String requestUrl, WikiPage wikiPage,  
+			Map<String, String> parameters) throws ClientServicesException {
+		try {
+			Map<String,String> headers = new HashMap<String, String>();
+			headers.put("Content-Type", "application/atom+xml");
+			WikiPageSerializer serializer = new WikiPageSerializer(wikiPage);
+			serializer.generateCreate();
+			return createData(requestUrl, parameters, headers, serializer.serializeToString());
+		}
+		catch(ClientServicesException e) {
+			throw e;
+		}
+		catch(Exception e) {
+			throw new ClientServicesException(e);
+		}
+	}
+	
+	private Response updateWikiPageAux(String requestUrl, WikiPage wikiPage,
+			Map<String, String> parameters) throws ClientServicesException {
+		try {
+			Map<String,String> headers = new HashMap<String, String>();
+			headers.put("Content-Type", "application/atom+xml");
+			WikiPageSerializer serializer = new WikiPageSerializer(wikiPage);
+			serializer.generateUpdate();
+			return updateData(requestUrl, parameters, headers, serializer.serializeToString());
+		}
+		catch(ClientServicesException e) {
+			throw e;
+		}
+		catch(Exception e) {
+			throw new ClientServicesException(e);
+		}
+	}
+	
+	private void deleteData(String requestUrl) throws ClientServicesException {
+		getClientService().delete(requestUrl, null, null, new ClientService.HandlerRaw());
+	}
 	
 	private EntityList<Wiki> getWikiEntityList(String requestUrl, 
 			Map<String, String> parameters) throws ClientServicesException {
@@ -269,7 +385,7 @@ public class WikiService extends BaseService {
 			Map<String, String> parameters) throws ClientServicesException {
 		try {
 			return (EntityList<WikiPage>)getEntities(requestUrl, 
-					getParameters(parameters), getWikiPagesFeedHandler());
+					getParameters(parameters), getWikiPageFeedHandler());
 		} catch (IOException e) {
 			throw new ClientServicesException(e);
 		}
@@ -278,7 +394,7 @@ public class WikiService extends BaseService {
 	private WikiPage getWikiPageEntity(String requestUrl, Map<String, String> parameters) 
 			throws ClientServicesException {
 		try {
-			return (WikiPage)getEntity(requestUrl, parameters, getWikiPagesFeedHandler());
+			return (WikiPage)getEntity(requestUrl, parameters, getWikiPageFeedHandler());
 		} catch (IOException e) {
 			throw new ClientServicesException(e);
 		}
@@ -288,17 +404,18 @@ public class WikiService extends BaseService {
 		return new AtomFeedHandler<Wiki>(this) {
 			@Override
 			protected Wiki newEntity(BaseService service, Node node) {
-//				XPathExpression xpath = (node instanceof Document) ? (XPathExpression)AtomXPath.singleEntry.getPath() : null;
-				return new Wiki(service, node, ConnectionsConstants.nameSpaceCtx, null);
+				XPathExpression xpath = (node instanceof Document) ? (XPathExpression)AtomXPath.singleEntry.getPath() : null;
+				return new Wiki(service, node, ConnectionsConstants.nameSpaceCtx, xpath);
 			}
 		};
 	}
 	
-	private IFeedHandler<WikiPage> getWikiPagesFeedHandler() {
+	private IFeedHandler<WikiPage> getWikiPageFeedHandler() {
 		return new AtomFeedHandler<WikiPage>(this) {
 			@Override
 			protected WikiPage newEntity(BaseService service, Node node) {
-				return new WikiPage(service, node, ConnectionsConstants.nameSpaceCtx, null);
+				XPathExpression xpath = (node instanceof Document) ? (XPathExpression)AtomXPath.singleEntry.getPath() : null;
+				return new WikiPage(service, node, ConnectionsConstants.nameSpaceCtx, xpath);
 			}
 		};
 	}

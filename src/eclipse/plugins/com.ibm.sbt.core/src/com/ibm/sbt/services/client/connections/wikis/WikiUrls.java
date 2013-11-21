@@ -31,18 +31,20 @@ import com.ibm.sbt.services.util.AuthUtil;
  *
  */
 public enum WikiUrls {
-	ALL_WIKIS("wikis/{0}/api/wikis/feed"),
-	PUBLIC_WIKIS("wikis/{0}/api/wikis/public"),
-	MY_WIKIS("wikis/{0}/api/mywikis/feed"),
-	MOST_COMMENTED_WIKIS("wikis/{0}/anonymous/api/wikis/mostcommented"),
+	ALL_WIKIS(             "wikis/{0}/api/wikis/feed"),
+	PUBLIC_WIKIS(          "wikis/{0}/api/wikis/public"),
+	MY_WIKIS(              "wikis/{0}/api/mywikis/feed"),
+	MOST_COMMENTED_WIKIS(  "wikis/{0}/anonymous/api/wikis/mostcommented"),
 	MOST_RECOMMENDED_WIKIS("wikis/{0}/anonymous/api/wikis/mostrecommended"),
-	MOST_VISITED_WIKIS("wikis/{0}/anonymous/api/wikis/mostvisited"),
-	WIKI_PAGES("wikis/{0}/anonymous/api/wiki/{1}/feed"),
-	WIKI_MYPAGES("wikis/{0}/api/wiki/{1}/mypages"),
-	WIKI_PAGES_TRASH("wikis/{0}/anonymous/api/wiki/{1}/recyclebin/feed"),
-	WIKI("wikis/{0}/anonymous/api/wiki/{1}/entry"),
-	WIKI_AUTH("wikis/{0}/api/wiki/{1}/entry"),
-	WIKI_PAGE("wikis/{0}/anonymous/api/wiki/{1}/page/{2}/entry");
+	MOST_VISITED_WIKIS(    "wikis/{0}/anonymous/api/wikis/mostvisited"),
+	WIKI_MYPAGES(          "wikis/{0}/api/wiki/{1}/mypages"),
+	WIKI_PAGES_TRASH(      "wikis/{0}/anonymous/api/wiki/{1}/recyclebin/feed"),
+	WIKI_PAGES(            "wikis/{0}/anonymous/api/wiki/{1}/feed"),
+	WIKI_PAGES_AUTH(       "wikis/{0}/api/wiki/{1}/feed"),
+	WIKI(                  "wikis/{0}/anonymous/api/wiki/{1}/entry"),
+	WIKI_AUTH(             "wikis/{0}/api/wiki/{1}/entry"),
+	WIKI_PAGE(             "wikis/{0}/anonymous/api/wiki/{1}/page/{2}/entry"),
+	WIKI_PAGE_AUTH(        "wikis/{0}/api/wiki/{1}/page/{2}/entry");
 	
 	private String urlPattern;
 	

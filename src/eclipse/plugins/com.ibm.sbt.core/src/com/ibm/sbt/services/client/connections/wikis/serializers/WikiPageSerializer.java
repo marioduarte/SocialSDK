@@ -16,6 +16,10 @@
 
 package com.ibm.sbt.services.client.connections.wikis.serializers;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import com.ibm.sbt.services.client.base.Namespace;
 import com.ibm.sbt.services.client.base.serializers.AtomEntitySerializer;
 import com.ibm.sbt.services.client.connections.wikis.WikiPage;
 
@@ -27,5 +31,39 @@ public class WikiPageSerializer extends AtomEntitySerializer<WikiPage> {
 
 	public WikiPageSerializer(WikiPage entity) {
 		super(entity);
+	}
+
+	public void generateCreate() {
+		Node entry = entry();
+		
+		appendChilds(entry,
+				title(),
+				label(),
+				wikiPageCategory(),
+				summary(),
+				content()
+		);
+		
+		appendChilds(entry, tags());
+	}
+
+	public void generateUpdate() {
+		Node entry = genericAtomEntry();
+		
+		appendChilds(entry,
+				label(),
+				wikiPageCategory()
+		);
+	}
+
+	private Element label() {
+		return textElement(Namespace.TD, "label", entity.getLabel());
+	}
+	
+	private Element wikiPageCategory() {
+		return element("category", 
+				attribute("scheme", "tag:ibm.com,2006:td/type"), 
+				attribute("term", "page"), 
+				attribute("label", "page"));
 	}
 }

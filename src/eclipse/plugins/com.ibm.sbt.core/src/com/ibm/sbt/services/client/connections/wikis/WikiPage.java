@@ -22,6 +22,7 @@ import com.ibm.commons.xml.NamespaceContext;
 import com.ibm.commons.xml.xpath.XPathExpression;
 import com.ibm.sbt.services.client.base.AtomEntity;
 import com.ibm.sbt.services.client.base.BaseService;
+import com.ibm.sbt.services.client.base.datahandlers.XmlDataHandler;
 
 /**
  * @author Mario Duarte
@@ -38,6 +39,23 @@ public class WikiPage extends AtomEntity {
 	public WikiPage(BaseService service, Node node,
 			NamespaceContext namespaceCtx, XPathExpression xpathExpression) {
 		super(service, node, namespaceCtx, xpathExpression);
+	}
+	
+	/**
+	 * 
+	 * @param service
+	 * @param dataHandler
+	 */
+	public WikiPage(BaseService service, XmlDataHandler dataHandler) {
+		super(service, dataHandler);
+	}
+	
+	/**
+	 * Create empty wikipage with no DataHandler
+	 * @param service
+	 */
+	public WikiPage(BaseService service) {
+		super(service, null);
 	}
 	
 	/**
@@ -69,5 +87,53 @@ public class WikiPage extends AtomEntity {
 	 */
 	public String getVersionLabel() {
 		return getAsString(WikiXPath.versionLabel);
+	}
+	
+	/**
+	 * Total number of recommendations of this page.
+	 * @return
+	 */
+	public int getNumberOfRecomendations() {
+		return getAsInt(WikiXPath.recommendationsCount);
+	}
+	
+	/**
+	 * Total number of comments to this page.
+	 * @return
+	 */
+	public int getNumberOfComments() {
+		return getAsInt(WikiXPath.commentsCount);
+	}
+	
+	/**
+	 * Total number of views of this page.
+	 * @return
+	 */
+	public int getNumberOfViews() {
+		return getAsInt(WikiXPath.viewCount);
+	}
+	
+	/**
+	 * Total number of anonymous views of this page.
+	 * @return
+	 */
+	public int getNumberOfAnonymousViews() {
+		return getAsInt(WikiXPath.anonymousViewsCount);
+	}
+	
+	/**
+	 * Total number of attachments to this page.
+	 * @return
+	 */
+	public int getNumberOfAttachments() {
+		return getAsInt(WikiXPath.attachmentsCount);
+	}
+	
+	/**
+	 * Total number of versions of this page.
+	 * @return
+	 */
+	public int getNumberOfVersions() {
+		return getAsInt(WikiXPath.versionsCount);
 	}
 }

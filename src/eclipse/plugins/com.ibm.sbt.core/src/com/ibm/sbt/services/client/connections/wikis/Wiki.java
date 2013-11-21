@@ -16,10 +16,7 @@
 
 package com.ibm.sbt.services.client.connections.wikis;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import org.w3c.dom.Node;
 
@@ -27,6 +24,8 @@ import com.ibm.commons.xml.NamespaceContext;
 import com.ibm.commons.xml.xpath.XPathExpression;
 import com.ibm.sbt.services.client.base.AtomEntity;
 import com.ibm.sbt.services.client.base.BaseService;
+import com.ibm.sbt.services.client.base.datahandlers.XmlDataHandler;
+import com.ibm.sbt.services.client.connections.activity.Member;
 
 /**
  * @author Mario Duarte
@@ -34,9 +33,33 @@ import com.ibm.sbt.services.client.base.BaseService;
  */
 public class Wiki extends AtomEntity {
 
+	/**
+	 * 
+	 * @param service
+	 * @param node
+	 * @param namespaceCtx
+	 * @param xpathExpression
+	 */
 	public Wiki(BaseService service, Node node, NamespaceContext namespaceCtx, 
 			XPathExpression xpathExpression) {
 		super(service, node, namespaceCtx, xpathExpression);
+	}
+	
+	/**
+	 * 
+	 * @param service
+	 * @param dataHandler
+	 */
+	public Wiki(BaseService service, XmlDataHandler dataHandler) {
+		super(service, dataHandler);
+	}
+	
+	/**
+	 * Create empty wiki with no DataHandler
+	 * @param service
+	 */
+	public Wiki(BaseService service) {
+		super(service, null);
 	}
 	
 	/**
@@ -73,28 +96,25 @@ public class Wiki extends AtomEntity {
 	
 	/**
 	 * 
-	 * @return The list of tags of the wiki.
-	 */
-	public Set<String> getTags() {
-		return new HashSet<String>(Arrays.asList(getCategoryTerms()));
-	}
-	
-	/**
-	 * 
-	 * @param tags
-	 */
-	public void setTags(Collection<String> tags) {
-		super.setCategoryTerms((String[])tags.toArray());
-	}
-	
-	/**
-	 * 
 	 * @return boolean indication whether or not this wiki is a community wiki.
 	 */
 	public boolean isCommunityWiki() {
 		return getCommunityUuid() != null;
 	}
 	
+	/**
+	 * List of users who can access the wiki. 
+	 * @return
+	 */
+	public List<Member> getSharedWith() {
+		throw new UnsupportedOperationException(); // FIXME
+	}
 	
-
+	/**
+	 * Specify who can access the wiki. 
+	 * @param members
+	 */
+	public void setSharedWith(List<Member> members) {
+		throw new UnsupportedOperationException(); // FIXME
+	}
 }
