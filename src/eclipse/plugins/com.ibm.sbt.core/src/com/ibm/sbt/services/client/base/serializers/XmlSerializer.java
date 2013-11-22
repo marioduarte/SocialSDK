@@ -87,19 +87,6 @@ public class XmlSerializer {
 		return stringWriter.toString();
 	}
 	
-	public String serializeToString3() {
-		DOMImplementationLS domImplementation = (DOMImplementationLS) doc.getImplementation();
-	    LSSerializer lsSerializer = domImplementation.createLSSerializer();
-	    lsSerializer.getDomConfig().setParameter("format-pretty-print", true);
-	    return lsSerializer.writeToString(doc);   
-	}
-	
-	public String serializeToString2() {
-		StringWriter writer = new StringWriter();
-		serialize2(writer);
-		return writer.toString();
-	}
-	
 	public void serialize(Writer writer) {
 		try {
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -112,6 +99,12 @@ public class XmlSerializer {
 		catch (TransformerException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public String serializeToString2() {
+		StringWriter writer = new StringWriter();
+		serialize2(writer);
+		return writer.toString();
 	}
 	
 	public void serialize2(Writer writer) {

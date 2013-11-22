@@ -186,7 +186,7 @@ public class WikiService extends BaseService {
 	 */
 	public Wiki getWiki(String wikiLabel, Map<String, String> parameters) 
 			throws ClientServicesException {
-		String requestUrl = WikiUrls.WIKI.format(endpoint, wikiLabel); 
+		String requestUrl = WikiUrls.WIKI_AUTH.format(endpoint, wikiLabel); 
 		return getWikiEntity(requestUrl, parameters);
 	}
 	
@@ -241,7 +241,7 @@ public class WikiService extends BaseService {
 	 */
 	public WikiPage getWikiPage(String wikiLabel, String pageLabel, 
 			Map<String, String> parameters) throws ClientServicesException {
-		String requestUrl = WikiUrls.WIKI_PAGE.format(endpoint, wikiLabel, pageLabel);
+		String requestUrl = WikiUrls.WIKI_PAGE_AUTH.format(endpoint, wikiLabel, pageLabel);
 		return getWikiPageEntity(requestUrl, parameters);
 	}
 	
